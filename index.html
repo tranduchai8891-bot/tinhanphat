@@ -334,8 +334,8 @@ input[type="date"],input[type="number"]{font-size:16px!important}
 
         <div class="annex-section">
           <div class="annex-title">3. Nhóm Vi phạm</div>
-          <p class="annex-desc"><strong>Không giữ phong độ sau khi được giảm án (Khoản 5):</strong> Phải tích lũy lại 4 quý loại Khá (trong đó ≥ 2 quý liền kề thời điểm xét).</p>
-          <p class="annex-desc" style="margin-top:6px"><strong>Bị xử lý kỷ luật (Khoản 6) – đồng hồ thi đua bị reset:</strong></p>
+          <p class="annex-desc"><strong>Phạm nhân đã giảm mà xếp loại gián đoạn (Khoản 5):</strong> Phải tích lũy lại 4 quý loại Khá (trong đó ≥ 2 quý liền kề thời điểm xét).</p>
+          <p class="annex-desc" style="margin-top:6px"><strong>Bị xử lý kỷ luật (Khoản 6):</strong></p>
           <div class="annex-row"><span class="annex-lbl">Khiển trách 2 lần / Cảnh cáo</span><span class="annex-val">4 quý liền kề loại Khá</span></div>
           <div class="annex-row"><span class="annex-lbl">Giam buồng kỷ luật</span><span class="annex-val">5 quý liền kề loại Khá</span></div>
           <p class="annex-desc" style="margin-top:6px"><strong>Phạm tội mới trong tù (Khoản 7):</strong></p>
@@ -840,8 +840,8 @@ function calculate(){
   document.getElementById('timeline').innerHTML=tl;
 
   lastResultText=
-`KẾT QUẢ TÍNH TOÁN THỜI HẠN CHẤP HÀNH ÁN
-----------------------------------------
+`KẾT QUẢ TÍNH THỜI HẠN CHẤP HÀNH ÁN
+------------------------------
 Ngày bắt giam: ${fmtDate(arrestDate)}
 Mức án ban đầu: ${fmtDays(sentMonths,sD)}
 Trừ tạm giam: ${fmtDays(preDetMonths,pdD)}
