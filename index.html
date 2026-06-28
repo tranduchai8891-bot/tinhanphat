@@ -453,7 +453,7 @@ input[type="date"],input[type="number"]{font-size:16px!important}
       <div class="slide-page" id="remissionPage">
         <div class="slide-page-head">
           <button class="slide-back-btn" onclick="closeRemissionPage()">‹ Quay lại</button>
-          <div class="slide-page-title">Tra cứu giảm án</div>
+          <div class="slide-page-title">Tra cứu giảm án (Tính năng đang thử nghiệm)</div>
         </div>
         <div class="slide-page-body" id="remissionPageBody"></div>
       </div>
@@ -1099,11 +1099,11 @@ let lastEligibleData=null;
 // Yêu cầu xếp loại Khá liên tục theo mức án (bám bảng phụ lục Phần I.2).
 function gradeRequirement(sentMonths){
   const y=sentMonths/12;
-  if(y>20) return {quarters:14, text:'≥ 3 năm 6 tháng (14 quý)'};
-  if(y>15) return {quarters:12, text:'≥ 3 năm (12 quý)'};
-  if(y>10) return {quarters:8,  text:'≥ 2 năm (8 quý)'};
-  if(y>5)  return {quarters:4,  text:'≥ 1 năm (4 quý)'};
-  if(y>3)  return {quarters:2,  text:'≥ 6 tháng (2 quý)'};
+  if(y>20) return {quarters:14, text:'14 quý'};
+  if(y>15) return {quarters:12, text:'12 quý'};
+  if(y>10) return {quarters:8,  text:'8 quý'};
+  if(y>5)  return {quarters:4,  text:'4 quý'};
+  if(y>3)  return {quarters:2,  text:'2 quý'};
   return {quarters:1, text:'≥ 1 quý gần nhất'};
 }
 
