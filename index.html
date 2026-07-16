@@ -502,7 +502,7 @@ input[type="date"],input[type="number"]{font-size:16px!important}
     <button class="btn-calc" onclick="calculate()"><span class="btn-calc-ico">🧮</span><span class="btn-calc-txt">Tính án phạt</span></button>
     <div class="action-annex">
       <button class="btn-annex" onclick="openAnnex()">📋 Phụ lục điều kiện xét giảm thời hạn chấp hành án</button>
-      <button class="btn-annex" onclick="openDecree()">📖 Mục 4 - Nghị định 170 (Xếp loại chấp hành án phạt tù)</button>
+      <button class="btn-annex" onclick="openDecree()">📖 Mục 4 - Nghị định 170 (Xếp loại CHAPT)</button>
       <button class="btn-annex" onclick="openReceipt()">🧾 Tra cứu biên lai điện tử (Bộ Tư pháp)</button>
     </div>
   </div>
@@ -1584,10 +1584,10 @@ let lastEligibleData=null;
 function crimeClass(sentMonths, extraDays){
   const total = (sentMonths||0) + ((extraDays||0) > 0 ? 0.001 : 0); // ngày lẻ vượt qua mốc tròn
   if(total<=0)      return null;
-  if(total<=36)     return {text:'Ít NT',        cls:'c1'};
+  if(total<=36)     return {text:'Ít nghiêm trọng',        cls:'c1'};
   if(total<=84)     return {text:'Nghiêm trọng', cls:'c2'};
-  if(total<=180)    return {text:'Rất NT',       cls:'c3'};
-  return                   {text:'Đặc biệt NT',  cls:'c4'};
+  if(total<=180)    return {text:'Rất nghiêm trọng',       cls:'c3'};
+  return                   {text:'ĐB nghiêm trọng',  cls:'c4'};
 }
 
 // Hiển thị nhãn phân loại tội phạm trên thẻ "Mức án ban đầu"
