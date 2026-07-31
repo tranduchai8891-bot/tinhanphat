@@ -250,6 +250,15 @@ input[type="date"],input[type="number"]{font-size:16px!important}
 .rm-k7-period{background:none;border:none;border-top:1px solid #c3d8f2;border-radius:0;padding:10px 0 0;margin:11px 0 0}
 .rm-k7-period label{display:block;font-size:11.5px;font-weight:700;color:#2b5f9e;margin-bottom:6px}
 .k7-select{position:relative}
+.rm-arrival{background:#fdf6e9;border:1.5px solid #e8c87a;border-radius:10px;padding:11px 13px;margin-bottom:12px}
+.rm-arrival label{display:block;font-size:11.5px;font-weight:700;color:#9b6a0a;margin-bottom:6px}
+.rm-arrival label span{font-weight:500;color:#a98a4b;font-size:10.5px}
+.rm-arrival .input-clearable{position:relative}
+.rm-arrival input{width:100%;box-sizing:border-box;font-family:'Be Vietnam Pro',-apple-system,sans-serif;font-size:14px;font-weight:700;color:#7a5208;padding:9px 34px 9px 11px;border:1.5px solid #e0c68a;border-radius:8px;background:#fff;outline:none;height:42px}
+.rm-arrival input:focus{border-color:#9b6a0a}
+.rm-arrival input::placeholder{color:#c9b183;font-weight:500}
+.rm-arrival .input-clear-btn{right:6px}
+.rm-arrival-hint{font-size:11.5px;color:#8a6510;line-height:1.5;margin-top:7px}
 .k7-btn{width:100%;box-sizing:border-box;text-align:left;font-family:'Be Vietnam Pro',-apple-system,sans-serif;font-size:12px;font-weight:700;color:#7f93ab;padding:10px 30px 10px 11px;border:1.5px solid #a8c2e0;border-radius:8px;background:#fff;cursor:pointer;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.1px;
   background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b5f9e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 10px center;background-size:13px}
@@ -2056,6 +2065,14 @@ function openRemissionPage(){
     const e=lastEligibleData;
     const grade=gradeRequirement(e.sentMonths);
     html+=`
+      <div class="rm-arrival">
+        <label for="rmArrival">Ngày đến trại <span>(ngày lập biên bản tiếp nhận — Điều 21 NĐ 170/2026)</span></label>
+        <div class="input-clearable">
+          <input type="text" id="rmArrival" class="date-single-input" placeholder="ngày/tháng/năm" inputmode="numeric" maxlength="10" oninput="formatDateInput(this);toggleClearBtn(this);refreshRemissionGrade()" onfocus="toggleClearBtn(this)" onblur="expandYearOnBlur(this);toggleClearBtn(this);refreshRemissionGrade()">
+          <button type="button" class="input-clear-btn" onclick="clearArrival()" title="Xóa">✕</button>
+        </div>
+        <div class="rm-arrival-hint" id="rmArrivalHint"></div>
+      </div>
       <div class="rm-card">
         <div class="rm-row"><span class="rm-lbl">Mức án ban đầu</span><span class="rm-val">${formatYearMonth(e.sentMonths)}</span></div>
         <div class="rm-row"><span class="rm-lbl" id="rmMilestoneLbl">Ngày đạt mốc 1/3</span><span class="rm-val" id="rmMilestoneVal">${fmtDate(e.oneThirdDate)}</span></div>
@@ -2079,12 +2096,8 @@ function openRemissionPage(){
       <div class="rm-penalty">
         <div class="rm-penalty-title">⚠️ Tình tiết tăng nặng — tiền án (Khoản 6)</div>
         <div class="rm-penalty-row">
-          <label>Số tiền án <b>trên 3 năm</b><br><span>(mỗi tiền án +2 quý Khá)</span></label>
-          <input type="text" inputmode="numeric" id="rmPenaltyOver3" placeholder="0" maxlength="2" onfocus="this.placeholder=''" onblur="this.placeholder='0'" oninput="onPenaltyInput(this)">
-        </div>
-        <div class="rm-penalty-row">
-          <label>Số tiền án <b>từ 3 năm trở xuống</b><br><span>(mỗi tiền án +1 quý Khá)</span></label>
-          <input type="text" inputmode="numeric" id="rmPenaltyUnder3" placeholder="0" maxlength="2" onfocus="this.placeholder=''" onblur="this.placeholder='0'" oninput="onPenaltyInput(this)">
+          <label>Số tiền án<br><span id="rmPenaltyRule">(mỗi tiền án +2 quý Khá)</span></label>
+          <input type="text" inputmode="numeric" id="rmPenaltyCount" placeholder="0" maxlength="2" onfocus="this.placeholder=''" onblur="this.placeholder='0'" oninput="onPenaltyInput(this)">
         </div>
       </div>
       <div class="rm-k7-toggle">
@@ -2213,10 +2226,14 @@ else initRemissionBackSwipe();
 
 // ===== TÌNH TIẾT TĂNG NẶNG - TIỀN ÁN (Khoản 6) =====
 // Số quý xếp loại Khá cộng thêm: mỗi tiền án > 3 năm +2 quý; mỗi tiền án ≤ 3 năm +1 quý.
+// Khoản 6 Điều 5 NQ 03: mỗi tiền án ứng với 02 quý xếp loại Khá trở lên;
+// nếu mức án hiện tại từ 03 năm trở xuống thì mỗi tiền án ứng với 01 quý.
 function penaltyExtraQuarters(){
-  const o=parseInt((document.getElementById('rmPenaltyOver3')||{}).value)||0;
-  const u=parseInt((document.getElementById('rmPenaltyUnder3')||{}).value)||0;
-  return o*2 + u*1;
+  const n=parseInt((document.getElementById('rmPenaltyCount')||{}).value)||0;
+  if(!n)return 0;
+  const sentMonths=lastEligibleData?lastEligibleData.sentMonths:0;
+  const perPrior=(sentMonths<=36)?1:2;
+  return n*perPrior;
 }
 function onPenaltyInput(el){
   el.value=el.value.replace(/[^\d]/g,'');
@@ -2307,6 +2324,69 @@ function toggleK7(){
   refreshRemissionGrade();
 }
 
+// ===== Điều 21 NĐ 170/2026: tính các quý đã đủ điều kiện xếp loại =====
+// Tháng được xếp loại: đã chấp hành >= 21 ngày trong tháng đó.
+// Quý được xếp loại: có >= 02 tháng được xếp loại trong quý.
+// Quý I: 01/12 (năm trước) - cuối tháng 02; Quý II: 01/3-31/5; Quý III: 01/6-31/8; Quý IV: 01/9-30/11.
+const QUARTER_DEFS=[
+  {name:'I',  startMonth:12, startYearOffset:-1, endMonth:2},
+  {name:'II', startMonth:3,  startYearOffset:0,  endMonth:5},
+  {name:'III',startMonth:6,  startYearOffset:0,  endMonth:8},
+  {name:'IV', startMonth:9,  startYearOffset:0,  endMonth:11}
+];
+function lastDayOfMonth(y,m){return new Date(y,m,0).getDate();}
+function monthGraded(arrival,y,m){
+  // Số ngày đã chấp hành trong tháng (y,m) tính từ ngày đến trại
+  const total=lastDayOfMonth(y,m);
+  const first=new Date(y,m-1,1), last=new Date(y,m-1,total);
+  if(arrival>last)return false;
+  const startDay=(arrival<=first)?1:arrival.getDate();
+  return (total-startDay+1)>=21;
+}
+// Danh sách quý đã hoàn thành (kèm ngày kết thúc quý) từ ngày đến trại đến ngày tham chiếu
+function completedQuarters(arrival,refDate){
+  const out=[];
+  if(!arrival)return out;
+  for(let y=arrival.getFullYear();y<=refDate.getFullYear()+1;y++){
+    for(const q of QUARTER_DEFS){
+      const sy=y+q.startYearOffset;
+      const endDay=lastDayOfMonth(y,q.endMonth);
+      const end=new Date(y,q.endMonth-1,endDay);
+      if(end>refDate)continue;              // quý chưa kết thúc
+      // đếm số tháng được xếp loại trong quý
+      let months=0, my=sy, mm=q.startMonth;
+      for(let k=0;k<3;k++){
+        if(monthGraded(arrival,my,mm))months++;
+        mm++; if(mm>12){mm=1;my++;}
+      }
+      if(months>=2)out.push({end, label:'Quý '+q.name+'/'+y});
+    }
+  }
+  out.sort((a,b)=>a.end-b.end);
+  return out;
+}
+function clearArrival(){
+  const el=document.getElementById('rmArrival');
+  if(!el)return;
+  el.value='';
+  toggleClearBtn(el);
+  refreshRemissionGrade();
+  el.focus();
+}
+
+function getArrivalDate(){
+  const el=document.getElementById('rmArrival');
+  if(!el)return null;
+  const p=(el.value||'').split('/');
+  if(p.length<3)return null;
+  const d=parseInt(p[0]),m=parseInt(p[1]);
+  let y=parseInt(p[2]);
+  if(!d||!m||!y)return null;
+  if(String(p[2]).replace(/\D/g,'').length<=2)y=2000+y;   // năm viết tắt: 24 -> 2024
+  if(y<1900||m<1||m>12||d<1||d>31)return null;
+  return new Date(y,m-1,d);
+}
+
 function showWarn(msg){
   const t=document.getElementById('qwText');
   if(t)t.textContent=msg;
@@ -2346,6 +2426,35 @@ function updateConclusion(base,extra){
   const timeOK=!(milestone&&e.today&&milestone.getTime()>e.today.getTime());
   const fracTxt=isPriority?'1/4':'1/3';
 
+  // ===== Điều 21: quý đã đủ điều kiện xếp loại tính từ ngày đến trại =====
+  const arrival=getArrivalDate();
+  const qList=arrival?completedQuarters(arrival,e.today):[];
+  const availQ=qList.length;
+  const aHint=document.getElementById('rmArrivalHint');
+  if(aHint){
+    if(arrival){
+      const lastQ=qList.length?qList[qList.length-1]:null;
+      aHint.innerHTML='Theo Điều 21, tính đến nay đã có <b>'+availQ+' quý</b> đủ điều kiện xếp loại'
+        + (lastQ?(' (gần nhất: '+lastQ.label+', kết thúc '+fmtDate(lastQ.end)+')'):'')+'.';
+    }else aHint.innerHTML='';
+  }
+  // Tìm đợt xét đầu tiên có đủ số quý (kết quả quý phải có trước ngày xét ít nhất 30 ngày)
+  function reviewWithQuarters(need){
+    if(!arrival||!need)return null;
+    let y=milestone.getFullYear(), found=null;
+    for(let k=0;k<40&&!found;k++){
+      for(const r of REVIEW_DATES){
+        const rd=new Date(y,r.reviewMonth-1,r.reviewDay);
+        if(rd<milestone)continue;
+        const cutoff=new Date(rd.getTime()-30*24*3600*1000);
+        const cnt=qList.filter(q=>q.end<=cutoff).length;
+        if(cnt>=need){found={name:r.name,date:rd};break;}
+      }
+      y++;
+    }
+    return found;
+  }
+
   // ===== Yêu cầu về xếp loại =====
   const baseQ=Math.max(0,base.quarters)+extra;
   let needAdj,needTotal,needTxt;
@@ -2378,6 +2487,15 @@ function updateConclusion(base,extra){
       +'Đã đạt mốc '+fracTxt+' mức án ngày <b>'+fmtDate(milestone)+'</b>. '
       +'Vui lòng nhập <b>số quý xếp loại Khá</b> ở trên để đối chiếu (yêu cầu: '+needTxt
       +(k5Avail?('; hoặc theo Khoản 5: tổng ≥ '+k5Total+' quý và ≥ '+k5Adj+' quý liền kề'):'')+').';
+    return;
+  }
+
+  // Kiểm tra số quý nhập so với số quý đủ điều kiện theo Điều 21
+  if(arrival&&qTotal>availQ){
+    box.className='rm-conclusion no';
+    box.innerHTML='<span class="rc-head">Số quý chưa hợp lý</span>'
+      +'Tính từ ngày đến trại <b>'+fmtDate(arrival)+'</b> theo Điều 21, đến nay mới có <b>'+availQ
+      +' quý</b> đủ điều kiện xếp loại. Vui lòng kiểm tra lại số quý đã nhập.';
     return;
   }
 
@@ -2421,10 +2539,13 @@ function updateConclusion(base,extra){
   }
 
   if(ok){
+    const needQ=isK7?Math.max(qAdj,1):needAdj;
+    const realReview=reviewWithQuarters(needQ)||review;
     box.className='rm-conclusion ok';
-    box.innerHTML='<span class="rc-head">✓ Đủ điều kiện xét giảm án</span>'
+    box.innerHTML='<span class="rc-head">Đủ điều kiện xét giảm án</span>'
       +'Đã đủ điều kiện về <b>thời gian</b> ('+fracTxt+' mức án) và <b>xếp loại</b>: '+viaTxt+'. '
-      +(review?('Đề nghị xét giảm tại đợt <b>'+review.name+' ('+fmtDate(review.date)+')</b>. '):'')
+      +(realReview?('Đề nghị xét giảm tại đợt <b>'+realReview.name+'</b> (ngày xét <b>'+fmtDate(realReview.date)+'</b>). '):'')
+      +(arrival?('Số quý xếp loại tính từ ngày đến trại <b>'+fmtDate(arrival)+'</b> theo Điều 21. '):'')
       +'Lưu ý đối chiếu thêm điều kiện về <b>biến động</b> và các quy định hiện hành.';
     return;
   }
@@ -2457,6 +2578,13 @@ function refreshRemissionGrade(){
   const base = isPriority ? gradeRequirementPriority(e.sentMonths) : gradeRequirement(e.sentMonths);
   const color = isPriority ? '#9b6a0a' : '';
   const baseQ = Math.max(0, base.quarters) + extra;
+
+  // Chú thích Khoản 6 theo mức án hiện tại
+  const ruleEl=document.getElementById('rmPenaltyRule');
+  if(ruleEl){
+    const per=(e.sentMonths<=36)?1:2;
+    ruleEl.textContent='(mức án '+(per===1?'từ 03 năm trở xuống → mỗi tiền án +1 quý Khá)':'trên 03 năm → mỗi tiền án +2 quý Khá)');
+  }
 
   if(valEl){
     let txt;
