@@ -1,0 +1,35 @@
+{
+  "id": "/tinhanphat/",
+  "name": "Tính thời hạn chấp hành án phạt tù",
+  "short_name": "Tính án phạt",
+  "description": "Tra cứu ngày hết án và thời gian còn lại sau giảm án",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#5c0d0d",
+  "theme_color": "#7f1d1d",
+  "lang": "vi",
+  "dir": "ltr",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
