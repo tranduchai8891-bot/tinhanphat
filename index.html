@@ -1063,7 +1063,7 @@ html.no-scroll,body.no-scroll{overflow:hidden;height:100%;touch-action:none;-web
   <!-- CỬA SỔ CHỌN PHẠM VI ÁP DỤNG CHẾ ĐỘ "NGÀY THỰC" -->
   <div class="choice-overlay" id="modeChoiceOverlay" onclick="if(event.target===this)closeModeChoice()">
     <div class="choice-box">
-      <div class="choice-title">Áp dụng theo ngày thực</div>
+      <div class="choice-title">Áp dụng theo phần mềm QLPN mới</div>
       <div class="choice-desc">Cộng ngày lẻ theo <b>lịch thực tế</b> (tháng 28/29/30/31 ngày) thay cho quy ước 30 ngày.<br>Bạn muốn áp dụng cách tính này thế nào?</div>
       <button type="button" class="choice-btn primary" onclick="chooseRealDay(true)">
         <span class="choice-btn-main">Luôn áp dụng</span>
@@ -1071,7 +1071,7 @@ html.no-scroll,body.no-scroll{overflow:hidden;height:100%;touch-action:none;-web
       </button>
       <button type="button" class="choice-btn" onclick="chooseRealDay(false)">
         <span class="choice-btn-main">Áp dụng lần này</span>
-        <span class="choice-btn-sub">Tính xong sẽ quay về cách tính QLPN - C10</span>
+        <span class="choice-btn-sub">Tính xong sẽ quay về cách tính phần mềm QLPN cũ</span>
       </button>
       <button type="button" class="choice-cancel" onclick="closeModeChoice()">Hủy</button>
     </div>
@@ -1190,10 +1190,10 @@ html.no-scroll,body.no-scroll{overflow:hidden;height:100%;touch-action:none;-web
 
         <div class="calc-mode">
           <div class="calc-mode-btns">
-            <button type="button" class="calc-mode-btn active" id="btnModeQlpn" onclick="setCalcMode('qlpn',true)">Áp dụng theo phần mềm QLPN - C10</button>
-            <button type="button" class="calc-mode-btn" id="btnModeThuc" onclick="askRealDayMode()">Áp dụng theo ngày thực</button>
+            <button type="button" class="calc-mode-btn active" id="btnModeQlpn" onclick="setCalcMode('qlpn',true)">Áp dụng theo phần mềm QLPN cũ</button>
+            <button type="button" class="calc-mode-btn" id="btnModeThuc" onclick="askRealDayMode()">Áp dụng theo phần mềm QLPN mới</button>
           </div>
-          <div class="calc-mode-note" id="calcModeNote">Quy ước <b>30 ngày = 01 tháng</b> khi cộng ngày lẻ (giống phần mềm QLPN - C10).</div>
+          <div class="calc-mode-note" id="calcModeNote">Quy ước <b>30 ngày = 01 tháng</b> khi cộng ngày lẻ (giống phần mềm QLPN cũ).</div>
         </div>
 
 
