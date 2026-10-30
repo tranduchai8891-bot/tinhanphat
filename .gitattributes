@@ -1,0 +1,7 @@
+# Giữ nguyên ký tự xuống dòng kiểu LF trên mọi máy (kể cả Windows),
+# để index.html ghép ra luôn giống hệt từng byte.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.gz binary
+*.xlsx binary

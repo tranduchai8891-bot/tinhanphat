@@ -1,0 +1,133 @@
+  <!-- POPUP CHI TIẾT HỒ SƠ PHẠM NHÂN -->
+  <div class="modal-overlay" id="profDetailOverlay" onclick="if(event.target===this)closeProfDetail()">
+    <div class="modal-box">
+      <div class="modal-scroll" id="profDetailBody"></div>
+      <div class="modal-actions">
+        <button class="modal-btn ghost" onclick="closeProfDetail()">Đóng</button>
+        <button class="modal-btn ghost" onclick="printProfilePhieu()">In phiếu</button>
+        <button class="modal-btn close" id="profEditBtn" onclick="editFromDetail()">Sửa thông tin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP XÁC NHẬN XÓA -->
+  <div class="modal-overlay" id="confirmOverlay" style="z-index:2200" onclick="if(event.target===this)closeConfirm()">
+    <div class="qpick-box">
+      <div class="cfm-title" id="cfmTitle">Xóa toàn bộ hồ sơ đã lưu?</div>
+      <div class="cfm-actions">
+        <button class="modal-btn ghost" onclick="closeConfirm()">Hủy</button>
+        <button class="modal-btn danger" id="cfmOk" onclick="acceptConfirm()">Xóa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP CHIA SẺ DỮ LIỆU HỒ SƠ -->
+  <div class="modal-overlay" id="shareOptOverlay" style="z-index:2100" onclick="if(event.target===this)closeShareOpt()">
+    <div class="qpick-box">
+      <div class="qpick-title">Chia sẻ dữ liệu</div>
+      <button type="button" class="exp-opt" onclick="closeShareOpt();exportProfilesFile()">
+        <span class="exp-opt-t">Xuất dữ liệu</span>
+        <span class="exp-opt-d">Tạo file dữ liệu để sao lưu hoặc gửi cho máy khác</span>
+      </button>
+      <button type="button" class="exp-opt" onclick="closeShareOpt();document.getElementById('profImportInput').click()">
+        <span class="exp-opt-t">Nhập dữ liệu</span>
+        <span class="exp-opt-d">Chọn file dữ liệu để nạp hồ sơ vào máy này</span>
+      </button>
+      <button type="button" class="exp-opt" onclick="closeShareOpt();startExcelImport()">
+        <span class="exp-opt-t">Nhập danh sách từ Excel</span>
+        <span class="exp-opt-d">Tạo hồ sơ hàng loạt từ file Excel (.xlsx) hoặc CSV theo file mẫu</span>
+      </button>
+      <button type="button" class="exp-opt" onclick="closeShareOpt();downloadImportTemplate()">
+        <span class="exp-opt-t">Tải file Excel mẫu</span>
+        <span class="exp-opt-d">Các cột: họ tên, ngày bắt, mức án, tạm giam, đã giảm, ngày đến trại...</span>
+      </button>
+      <button class="modal-btn close" style="width:100%;margin-top:6px" onclick="closeShareOpt()">Đóng</button>
+    </div>
+  </div>
+
+  <!-- POPUP BẢO MẬT DỮ LIỆU -->
+  <div class="modal-overlay" id="secOverlay" style="z-index:2100" onclick="if(event.target===this)closeSecurity()">
+    <div class="qpick-box">
+      <div class="qpick-title">Bảo mật dữ liệu</div>
+      <div id="secBody"></div>
+      <button class="modal-btn ghost" style="width:100%;margin-top:6px" onclick="closeSecurity()">Đóng</button>
+    </div>
+  </div>
+
+  <!-- POPUP NHẬP MÃ PIN -->
+  <div class="modal-overlay" id="pinOverlay" style="z-index:2150" onclick="if(event.target===this)closePin()">
+    <div class="qpick-box">
+      <div class="qpick-title" id="pinTitle">Nhập mã PIN</div>
+      <p class="sec-note" id="pinNote"></p>
+      <div class="pin-wrap">
+        <input type="password" id="pinA" class="pin-input" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Mã PIN"
+               oninput="this.value=this.value.replace(/\D/g,'')" onkeydown="if(event.key==='Enter')confirmPin()">
+        <button type="button" class="pin-eye" onmousedown="event.preventDefault()" onclick="togglePinEye('pinA',this)" title="Hiện mã PIN" aria-label="Hiện mã PIN"><svg class="ic-eye" aria-hidden="true"><use href="#ic-eye"/></svg></button>
+      </div>
+      <div class="pin-wrap">
+        <input type="password" id="pinB" class="pin-input" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="Nhập lại mã PIN"
+               oninput="this.value=this.value.replace(/\D/g,'')" onkeydown="if(event.key==='Enter')confirmPin()">
+        <button type="button" class="pin-eye" onmousedown="event.preventDefault()" onclick="togglePinEye('pinB',this)" title="Hiện mã PIN" aria-label="Hiện mã PIN"><svg class="ic-eye" aria-hidden="true"><use href="#ic-eye"/></svg></button>
+      </div>
+      <div class="sec-msg" id="pinMsg"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="modal-btn ghost" style="flex:1" onclick="closePin()">Hủy</button>
+        <button class="modal-btn close" style="flex:1" id="pinOk" onclick="confirmPin()">Đồng ý</button>
+      </div>
+      <button type="button" class="sec-link" id="pinForgot" onclick="forgotPin()">Quên mã PIN?</button>
+    </div>
+  </div>
+
+  <!-- POPUP MẬT KHẨU FILE DỮ LIỆU -->
+  <div class="modal-overlay" id="pwOverlay" style="z-index:2150" onclick="if(event.target===this)closePassword()">
+    <div class="qpick-box">
+      <div class="qpick-title" id="pwTitle">Mật khẩu file</div>
+      <p class="sec-note" id="pwNote"></p>
+      <input type="password" id="pwA" class="pin-input pw" autocomplete="new-password" maxlength="64" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')confirmPassword()">
+      <input type="password" id="pwB" class="pin-input pw" autocomplete="new-password" maxlength="64" placeholder="Nhập lại mật khẩu" onkeydown="if(event.key==='Enter')confirmPassword()">
+      <div class="sec-msg" id="pwMsg"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="modal-btn ghost" style="flex:1" onclick="closePassword()">Hủy</button>
+        <button class="modal-btn close" style="flex:1" id="pwOk" onclick="confirmPassword()">Đồng ý</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP TÙY CHỌN XUẤT EXCEL HỒ SƠ -->
+  <div class="modal-overlay" id="exportOptOverlay" style="z-index:2100" onclick="if(event.target===this)closeExportOpt()">
+    <div class="qpick-box">
+      <div class="qpick-title">Xuất file Excel</div>
+      <button type="button" class="exp-opt" onclick="exportProfilesToExcel('full')">
+        <span class="exp-opt-t">Danh sách tổng hợp</span>
+        <span class="exp-opt-d">Đầy đủ: ngày bắt, án phạt, tạm giam, ngày đến trại, tiền án, xếp loại, kỳ giảm</span>
+      </button>
+      <button type="button" class="exp-opt" onclick="exportProfilesToExcel('calc')">
+        <span class="exp-opt-t">Danh sách tính án</span>
+        <span class="exp-opt-d">Các mốc thời gian và kết quả tính án, giống file trong Lịch sử tra cứu</span>
+      </button>
+      <p class="k7pick-note" style="margin:0 0 6px;text-align:center">File Excel không được mã hóa — chỉ lưu, gửi qua kênh an toàn.</p>
+      <button class="modal-btn close" style="width:100%;margin-top:6px" onclick="closeExportOpt()">Đóng</button>
+    </div>
+  </div>
+
+  <!-- POPUP NHẬP TÊN PHẠM NHÂN KHI LƯU HỒ SƠ -->
+  <div class="modal-overlay" id="namePromptOverlay" style="z-index:2100" onclick="if(event.target===this)closeNamePrompt()">
+    <div class="qpick-box">
+      <div class="qpick-title">Tên phạm nhân</div>
+      <p class="k7pick-note" style="margin:-6px 0 10px;text-align:center">Hồ sơ cần có tên để quản lý. Nhập tên viết tắt hoặc đầy đủ.</p>
+      <input type="text" id="namePromptInput" class="date-single-input" placeholder="VD: N.V.A" maxlength="40" autocapitalize="words" style="width:100%;box-sizing:border-box;height:40px;font-size:14px;font-weight:700" oninput="capitalizeName(this)" onkeydown="if(event.key==='Enter')confirmNamePrompt()">
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="modal-btn ghost" style="flex:1" onclick="closeNamePrompt()">Đóng</button>
+        <button class="modal-btn close" style="flex:1" onclick="confirmNamePrompt()">Lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP CHỌN XẾP LOẠI QUÝ -->
+  <div class="modal-overlay" id="qPickOverlay" style="z-index:2100" onclick="if(event.target===this)closeQPick()">
+    <div class="qpick-box">
+      <div class="qpick-title" id="qPickTitle">Xếp loại quý</div>
+      <div id="qPickOpts"></div>
+      <button class="modal-btn close" style="width:100%;margin-top:4px" onclick="closeQPick()">Đóng</button>
+    </div>
+  </div>

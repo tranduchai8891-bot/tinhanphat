@@ -1,0 +1,172 @@
+{
+ "note": "Thứ tự ghép index.html — build.mjs đọc tệp này. Mỗi mục: tệp mã nguồn hoặc chuỗi cố định.",
+ "parts": [
+  {
+   "file": "src/head.html"
+  },
+  {
+   "file": "src/styles/app.css"
+  },
+  {
+   "text": "</style>\n</head>\n"
+  },
+  {
+   "file": "src/markup/01-dau-trang.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/02-form-nhap.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/03-phu-luc.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/04-popup-ho-so-bao-mat.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/05-popup-tron-ky-giam.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/06-nghi-dinh-170.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/07-bien-lai-qr.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/08-huong-dan.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/09-ket-qua.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/10-ho-so-lich-su.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/11-chan-trang.html",
+   "joinNewline": true
+  },
+  {
+   "file": "src/markup/12-tong-quan-xet-giam.html",
+   "joinNewline": false
+  },
+  {
+   "text": "<script>"
+  },
+  {
+   "file": "src/vendor/jsqr.min.js"
+  },
+  {
+   "text": "</script>\n\n<script>"
+  },
+  {
+   "file": "src/js/01-quy-dinh.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/02-tinh-ngay.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/03-tron-tam-dinh-chi.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/04-ngay-het-an-cac-moc.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/05-dot-xet-giam.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/06-popup-tron.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/07-form-nhap.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/08-che-do-ngay-le.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/09-ket-qua-tinh-an.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/10-trang-giam-an.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/11-man-hinh-khoi-dong.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/12-xep-loai-thi-dua.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/13-ket-luan-giam-an.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/14-bien-lai-qr.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/15-lich-su.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/16-khoa-pin.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/17-ho-so.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/18-xuat-nhap-du-lieu.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/19-tong-quan-xet-giam.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/20-xep-loai-quy-in-phieu.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/21-nhap-excel.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/22-tien-ich-giao-dien.js",
+   "joinNewline": true
+  },
+  {
+   "file": "src/js/23-tu-kiem-tra.js",
+   "joinNewline": false
+  },
+  {
+   "text": "</script>\n\n<!-- Cloudflare Web Analytics (đo lượt truy cập, không dùng cookie, không thu thập dữ liệu người dùng nhập) -->\n<script type=\"module\" src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{\"token\": \"306a4aadf2c74f4683efb3c1e98693d2\"}'></script>\n<!-- End Cloudflare Web Analytics -->\n<script>"
+  },
+  {
+   "file": "src/js/dang-ky-service-worker.js"
+  },
+  {
+   "text": "</script>\n</body>\n</html>\n"
+  }
+ ]
+}

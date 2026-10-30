@@ -1,0 +1,44 @@
+name: Kiểm thử tự động
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  kiem-thu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Ho_Chi_Minh
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Cài thư viện kiểm thử
+        run: npm ci
+
+      - name: Cài trình duyệt Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: index.html và sw.js khớp với mã nguồn trong src/
+        run: node build.mjs --check
+
+      - name: Chạy toàn bộ kiểm thử
+        run: node tests/run-all.js
+
+      - name: Lưu nhật ký kiểm thử
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nhat-ky-kiem-thu
+          path: test-output/
+          retention-days: 14

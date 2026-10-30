@@ -1,0 +1,64 @@
+<!-- THANH ĐIỀU HƯỚNG DƯỚI ĐÁY -->
+<nav class="bottom-nav" id="bottomNav" aria-label="Điều hướng chính">
+  <button type="button" class="bn-item on" data-k="calc" aria-current="page" onclick="goNav('calc')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 7h6M9 11h6M9 15h2"></path></svg><span>Tính án</span></button>
+  <button type="button" class="bn-item" data-k="team" onclick="goNav('team')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg><span>Tổng quan</span></button>
+  <button type="button" class="bn-item" data-k="profiles" onclick="goNav('profiles')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.6.8 2.6 2.5 3 5.2"></path></svg><span>Hồ sơ</span></button>
+  <button type="button" class="bn-item" data-k="review" onclick="goNav('review')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l2 2 4-4"></path><rect x="4" y="3" width="16" height="18" rx="2"></rect></svg><span>Xét giảm</span></button>
+</nav>
+
+<!-- TRANG TỔNG QUAN ĐỘI -->
+<div class="modal-overlay team-page" id="teamOverlay" onclick="if(event.target===this)closeTeam()">
+  <div class="modal-box">
+    <div class="modal-scroll" id="teamScroll">
+      <div class="tp-head"><div class="result-header" style="margin:0">Tổng quan đội<span class="result-refdate" id="teamDate"></span></div>
+        <button type="button" class="link-clear" onclick="closeTeam()">Đóng</button></div>
+      <div id="teamBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TRANG ĐỀ NGHỊ XÉT GIẢM THEO ĐỢT -->
+<div class="modal-overlay team-page" id="reviewOverlay" onclick="if(event.target===this)closeReview()">
+  <div class="modal-box">
+    <div class="modal-scroll" id="reviewScroll">
+      <div class="tp-head"><div class="result-header" style="margin:0">Đề nghị xét giảm án</div>
+        <button type="button" class="link-clear" onclick="closeReview()">Đóng</button></div>
+      <div id="reviewBody"></div>
+    </div>
+    <div class="rv-foot">
+      <div class="rv-count" id="reviewCount"></div>
+      <div class="rv-actions">
+        <button class="modal-btn ghost" onclick="printReview()">In danh sách</button>
+        <button class="modal-btn close" onclick="exportReviewExcel()">Xuất Excel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRANG XẾP LOẠI QUÝ CẢ ĐỘI -->
+<div class="modal-overlay team-page" id="gradeOverlay" onclick="if(event.target===this)closeGrades()">
+  <div class="modal-box">
+    <div class="modal-scroll" id="gradeScroll">
+      <div class="tp-head"><div class="result-header" style="margin:0">Xếp loại thi đua</div>
+        <button type="button" class="link-clear" onclick="closeGrades();openTeam()">Tổng quan</button></div>
+      <div id="gradeBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP THÔNG TIN TRÊN BẢN IN -->
+<div class="modal-overlay" id="printInfoOverlay" style="z-index:2100" onclick="if(event.target===this)closePrintInfo()">
+  <div class="qpick-box" style="max-width:340px">
+    <div class="qpick-title">Thông tin trên bản in</div>
+    <div id="printInfoBody"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="modal-btn ghost" style="flex:1" onclick="closePrintInfo()">Hủy</button>
+      <button class="modal-btn close" style="flex:1" onclick="confirmPrintInfo()">In</button>
+    </div>
+  </div>
+</div>
+<!-- Thư viện đọc mã QR (jsQR - MIT License, nhúng sẵn để dùng được cả khi không có mạng) -->

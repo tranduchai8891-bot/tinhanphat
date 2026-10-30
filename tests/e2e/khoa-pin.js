@@ -1,0 +1,163 @@
+const path=require('path'),fs=require('fs');
+const {chromium}=require('playwright');
+const SP=require('os').tmpdir()+'/';
+(async()=>{
+  const file='file://'+path.resolve(process.argv[2]);
+  const b=await chromium.launch();
+  const ctx=await b.newContext({viewport:{width:400,height:860},timezoneId:'Asia/Ho_Chi_Minh',locale:'vi-VN',acceptDownloads:true});
+  const pg=await ctx.newPage();
+  await pg.route(/^https?:\/\//,r=>r.abort());
+  const errs=[];pg.on('pageerror',e=>errs.push(e.message));pg.on('dialog',d=>{errs.push('dialog '+d.message());d.dismiss();});
+  const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
+  const ev=(f,...a)=>pg.evaluate(f,...a);
+  const vis=id=>ev(i=>{const e=document.getElementById(i);return !!e&&getComputedStyle(e).display!=='none';},id);
+  const helpers=()=>ev(()=>{
+    window.calcFor=(name,arrest,sY)=>{closeModal();const s=(i,v)=>document.getElementById(i).value=v;s('prisonerName',name);s('arrestDateText',arrest);s('sY',sY);s('sM','');s('sD','');s('pdY','');s('pdM','');s('pdD','');remissions=[{years:0,months:0}];k7PickShown=true;renderRemissions();calculate();};
+    window.pin=async(a,b)=>{document.getElementById('pinA').value=a;document.getElementById('pinB').value=b||'';await confirmPin();return document.getElementById('pinMsg').textContent;};
+  });
+  await pg.goto(file);await pg.waitForTimeout(1300);await helpers();
+  // 1. Lưu hồ sơ đầu tiên -> nhắc bật khóa PIN
+  await ev(()=>{calcFor('Nguyễn Văn A','10/03/2022','6 năm');calcFor('Trần Thị B','05/05/2023','3 năm');openRemissionPage();onFlipAction();});
+  ok(await vis('secOverlay'),'Lưu hồ sơ đầu tiên: app nhắc bật khóa PIN');
+  const secTxt=await ev(()=>document.getElementById('secBody').textContent);
+  ok(secTxt.includes('Đã lưu hồ sơ: Trần Thị B'),'  (có báo đã lưu hồ sơ)');
+  await ev(()=>{closeSecurity();closeModal();});
+  // 2. Bật khóa PIN
+  const foot=await ev(()=>[...document.querySelectorAll('.footer-guide-btn')].map(b=>b.textContent.trim()));
+  ok(foot.includes('Bảo mật')&&!foot.some(t=>t.includes('Đặt mã PIN')||t.includes('🔒')),'Nút cuối trang là "Bảo mật", không icon ('+foot.join(' | ')+')');
+  await ev(()=>[...document.querySelectorAll('.footer-guide-btn')].find(b=>b.textContent.trim()==='Bảo mật').click());
+  const setPop=await ev(()=>({t:document.getElementById('pinTitle').textContent,n:document.getElementById('pinNote').textContent}));
+  ok(await vis('pinOverlay')&&!(await vis('secOverlay'))&&setPop.t==='Đặt mã PIN','Chưa bật khóa: bấm "Bảo mật" mở thẳng popup Đặt mã PIN');
+  ok(setPop.n==='Dùng 4-6 chữ số. Quên mã PIN sẽ không khôi phục được.','Popup Đặt mã PIN chỉ còn chú thích: "'+setPop.n+'"');
+  // Nút mắt xem / ẩn mã PIN
+  const typ=()=>ev(()=>[document.getElementById('pinA').type,document.getElementById('pinB').type].join(','));
+  const eyeVis=await ev(()=>[...document.querySelectorAll('#pinOverlay .pin-eye')].map(b=>getComputedStyle(b.parentNode).display!=='none'&&b.getBoundingClientRect().width>0));
+  ok(eyeVis.length===2&&eyeVis.every(Boolean)&&(await typ())==='password,password','Đặt mã PIN: 2 ô đều có nút mắt, mặc định ẩn mã');
+  await pg.fill('#pinA','1234');await pg.focus('#pinA');
+  await pg.click('#pinA + .pin-eye');
+  const e1=await ev(()=>({t:document.getElementById('pinA').type,v:document.getElementById('pinA').value,f:document.activeElement.id,title:document.querySelector('#pinA + .pin-eye').title,h:document.querySelector('#pinA + .pin-eye use').getAttribute('href')}));
+  ok(e1.t==='text'&&e1.v==='1234'&&e1.title==='Ẩn mã PIN'&&e1.h==='#ic-eye-off'&&(await typ())==='text,password','Bấm mắt ô 1: hiện mã, ô 2 vẫn ẩn');
+  ok(e1.f==='pinA','  (con trỏ vẫn ở ô nhập, không mất bàn phím)');
+  await pg.click('#pinA + .pin-eye');
+  ok((await typ())==='password,password','Bấm mắt lần nữa: ẩn lại');
+  await pg.click('#pinB + .pin-eye');
+  ok((await typ())==='password,text','Bấm mắt ô 2: hiện mã ô 2');
+  await ev(()=>{closePin();openPin('set');});
+  ok((await typ())==='password,password','Đóng rồi mở lại popup: mã luôn ẩn trở lại');
+  await ev(()=>{closePin();openPin('unlock');});
+  const ul=await ev(()=>({b:getComputedStyle(document.getElementById('pinB').parentNode).display,eye:getComputedStyle(document.querySelector('#pinA + .pin-eye')).display}));
+  ok(ul.b==='none'&&ul.eye!=='none','Nhập mã PIN (mở khóa): 1 ô, có nút mắt');
+  await ev(()=>{closePin();openPin('set');});
+  ok((await ev(()=>pin('1234567','1234567'))).includes('4-6'),'Đặt PIN 7 số: bị từ chối (chỉ 4-6 số)');
+  ok((await ev(()=>pin('123','123'))).includes('4-6'),'Đặt PIN 3 số: bị từ chối');
+  ok((await ev(()=>pin('1234','1235'))).includes('chưa khớp'),'Đặt PIN: nhập lại không khớp bị từ chối');
+  await ev(()=>pin('123456','123456'));
+  const st=await ev(()=>({lock:!!localStorage.getItem(LOCK_KEY),vault:localStorage.getItem(VAULT_KEY),h:localStorage.getItem(HISTORY_KEY),p:localStorage.getItem(PROFILES_KEY),profiles:loadProfiles().length,history:loadHistory().length}));
+  const vaultBytes=Buffer.from(JSON.parse(st.vault).ct,'base64');
+  ok(st.lock&&st.vault&&st.h===null&&st.p===null,'Bật PIN: trong máy chỉ còn bản mã, bản rõ đã xóa');
+  ok(!vaultBytes.includes(Buffer.from('Trần Thị B'))&&!st.vault.includes('Tr'+'ần'),'Bản mã không chứa họ tên đọc được');
+  ok(st.profiles===1&&st.history===2,'Ngay sau khi bật: vẫn xem được 1 hồ sơ, 2 lịch sử');
+  // 3. Mở lại app -> bị khóa
+  await pg.reload();await pg.waitForTimeout(1300);await helpers();
+  ok(await vis('lockCard')&&!(await vis('profileCard'))&&!(await vis('historyCard')),'Mở lại app: hồ sơ & lịch sử bị ẩn, hiện thẻ "Đã khóa"');
+  ok((await ev(()=>loadProfiles().length))===0,'  (đang khóa: không đọc được hồ sơ)');
+  await ev(()=>calcFor('Lê Văn C','01/02/2024','2 năm'));
+  ok(await ev(()=>document.getElementById('modalOverlay').classList.contains('show')),'Đang khóa: vẫn tính án bình thường');
+  await ev(()=>closeModal());
+  ok((await ev(()=>document.getElementById('lockSub').textContent)).includes('1 lần tính mới'),'Thẻ khóa báo có 1 lần tính chưa vào lịch sử');
+  // 4. Lưu hồ sơ khi đang khóa -> hỏi PIN
+  await ev(()=>{calcFor('Lê Văn C','01/02/2024','2 năm');openRemissionPage();onFlipAction();});
+  ok(await vis('pinOverlay'),'Lưu hồ sơ khi đang khóa: hỏi mã PIN');
+  ok((await ev(()=>pin('000000'))).includes('không đúng'),'PIN sai: bị từ chối');
+  await ev(()=>pin('123456'));
+  const after=await ev(()=>({p:loadProfiles().map(p=>p.name),h:loadHistory().map(h=>h.name)}));
+  ok(after.p.includes('Lê Văn C')&&after.p.includes('Trần Thị B'),'Đúng PIN: mở khóa và lưu luôn hồ sơ C');
+  ok(JSON.stringify(after.h)===JSON.stringify(['Lê Văn C','Lê Văn C','Trần Thị B','Nguyễn Văn A']),'Lịch sử gộp đúng các lần tính khi đang khóa ('+after.h.join(', ')+')');
+  await ev(()=>closeModal());
+  ok(await vis('profileCard')&&!(await vis('lockCard')),'Đã mở khóa: hiện lại danh sách');
+  // 5. Bộ đếm nhập sai; sai 5 lần -> phải chờ
+  await ev(()=>openSecurity());
+  const sec=await ev(()=>({notes:document.querySelectorAll('#secBody .sec-note').length,desc:document.querySelectorAll('#secBody .exp-opt-d').length,btn:[...document.querySelectorAll('#secBody .exp-opt-t')].map(x=>x.textContent)}));
+  ok(sec.notes===0&&sec.desc===0&&sec.btn.join('|')==='Khóa ngay|Đổi mã PIN|Tắt khóa PIN','Popup Bảo mật dữ liệu: không còn chú thích, chỉ còn 3 nút');
+  await ev(()=>closeSecurity());
+  await ev(()=>lockNow());
+  ok(await vis('lockCard'),'Khóa ngay: ẩn dữ liệu');
+  await ev(()=>openPin('unlock'));
+  const m1=await ev(()=>pin('999999'));
+  ok(m1==='Mã PIN không đúng.\nĐã nhập sai 1 lần, còn 4 lần thử.','Sai lần 1: "'+m1+'"');
+  const m2=await ev(()=>pin('888888'));
+  ok(m2.includes('sai 2 lần, còn 3'),'Sai lần 2: đếm tiếp');
+  await pg.reload();await pg.waitForTimeout(1300);await helpers();
+  await ev(()=>openPin('unlock'));
+  const m3=await ev(()=>document.getElementById('pinMsg').textContent);
+  ok(m3==='Đã nhập sai 2 lần, còn 3 lần thử.','Tải lại trang: bộ đếm vẫn giữ ("'+m3+'")');
+  for(let k=0;k<3;k++)await ev(()=>pin('999999'));
+  const w1=await ev(()=>({m:document.getElementById('pinMsg').textContent,dis:document.getElementById('pinOk').disabled&&document.getElementById('pinA').disabled}));
+  ok(/^Mã PIN không đúng\.\nĐã nhập sai 5 lần\. Vui lòng chờ (30|29) giây\.$/.test(w1.m)&&w1.dis,'Sai lần 5: khóa ô nhập, đếm ngược 30 giây ("'+w1.m+'")');
+  ok((await ev(()=>pin('123456'))).includes('chờ'),'Đang chờ: nhập đúng cũng chưa được');
+  await pg.waitForTimeout(2100);
+  const w2=await ev(()=>document.getElementById('pinMsg').textContent);
+  ok(/chờ (2[0-8]) giây/.test(w2),'Đồng hồ đếm ngược chạy ("'+w2+'")');
+  await pg.reload();await pg.waitForTimeout(1300);await helpers();
+  await ev(()=>openPin('unlock'));
+  ok((await ev(()=>document.getElementById('pinMsg').textContent)).includes('Vui lòng chờ'),'Tải lại trang khi đang chờ: vẫn phải chờ');
+  await ev(()=>{LOCK.waitUntil=Date.now()+900;});
+  await pg.waitForTimeout(2200);
+  const w3=await ev(()=>({m:document.getElementById('pinMsg').textContent,dis:document.getElementById('pinOk').disabled}));
+  ok(w3.m==='Đã nhập sai 5 lần, còn 5 lần thử.'&&!w3.dis,'Hết thời gian chờ: nhập lại được ("'+w3.m+'")');
+  await ev(()=>pin('123456'));
+  ok(await ev(()=>LOCK.fails===0&&localStorage.getItem(PIN_FAIL_KEY)===null&&!!LOCK.key),'Nhập đúng: mở khóa, bộ đếm về 0');
+  // 6. Đổi PIN
+  await ev(()=>openPin('change'));await ev(()=>pin('654321','654321'));
+  await pg.reload();await pg.waitForTimeout(1300);await helpers();
+  await ev(()=>openPin('unlock'));
+  ok((await ev(()=>pin('123456'))).includes('không đúng'),'Đổi PIN: mã cũ không còn dùng được');
+  await ev(()=>pin('654321'));
+  ok((await ev(()=>loadProfiles().length))===2,'Đổi PIN: mã mới mở được, dữ liệu còn nguyên');
+  // 7. Tự khóa khi chạy nền quá 5 phút
+  await ev(()=>{LOCK.hiddenAt=Date.now()-6*60*1000;document.dispatchEvent(new Event('visibilitychange'));});
+  await pg.waitForTimeout(200);
+  ok(await vis('lockCard'),'Chạy nền quá 5 phút: tự khóa lại');
+  await ev(()=>openPin('unlock'));await ev(()=>pin('654321'));
+  // 8. Xuất file dữ liệu có mật khẩu
+  await ev(()=>exportProfilesFile());
+  ok(await vis('pwOverlay'),'Xuất dữ liệu: bắt buộc đặt mật khẩu');
+  await ev(()=>{document.getElementById('pwA').value='abc';document.getElementById('pwB').value='abc';return confirmPassword();});
+  ok((await ev(()=>document.getElementById('pwMsg').textContent)).includes('6 ký tự'),'Mật khẩu quá ngắn bị từ chối');
+  const [dl]=await Promise.all([pg.waitForEvent('download'),ev(()=>{document.getElementById('pwA').value='matkhau-2026';document.getElementById('pwB').value='matkhau-2026';return confirmPassword();})]);
+  const out=SP+'enc-'+dl.suggestedFilename();await dl.saveAs(out);
+  const raw=fs.readFileSync(out,'utf8');const j=JSON.parse(raw);
+  ok(j.type==='profiles-enc'&&!raw.includes('Tr'+'ần')&&!raw.includes('Nguy'),'File xuất đã mã hóa, không đọc được họ tên');
+  // 9. Nhập file trên máy khác
+  const ctx2=await b.newContext({timezoneId:'Asia/Ho_Chi_Minh',locale:'vi-VN'});const pg2=await ctx2.newPage();await pg2.route(/^https?:\/\//,r=>r.abort());
+  await pg2.goto(file);await pg2.waitForTimeout(1300);
+  await pg2.setInputFiles('#profImportInput',out);await pg2.waitForTimeout(300);
+  ok(await pg2.evaluate(()=>getComputedStyle(document.getElementById('pwOverlay')).display!=='none'),'Máy khác nhập file: hỏi mật khẩu');
+  await pg2.evaluate(()=>{document.getElementById('pwA').value='sai-mat-khau';return confirmPassword();});
+  ok((await pg2.evaluate(()=>document.getElementById('pwMsg').textContent)).includes('không đúng'),'Sai mật khẩu: không nhập được');
+  await pg2.evaluate(()=>{document.getElementById('pwA').value='matkhau-2026';return confirmPassword();});
+  ok((await pg2.evaluate(()=>loadProfiles().map(p=>p.name).sort().join(',')))==='Lê Văn C,Trần Thị B','Đúng mật khẩu: nhập đủ 2 hồ sơ');
+  await ctx2.close();
+  // 10. Tắt khóa PIN
+  await ev(()=>openPin('disable'));
+  ok((await ev(()=>pin('111111'))).includes('không đúng'),'Tắt khóa: phải nhập đúng PIN hiện tại');
+  await ev(()=>pin('654321'));
+  const off=await ev(()=>({lock:localStorage.getItem(LOCK_KEY),vault:localStorage.getItem(VAULT_KEY),p:JSON.parse(localStorage.getItem(PROFILES_KEY)||'[]').length,h:JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]').length}));
+  ok(!off.lock&&!off.vault&&off.p===2&&off.h===4,'Tắt khóa: dữ liệu trả về dạng thường, đủ 2 hồ sơ, 4 lịch sử');
+  // 11. Quên PIN
+  await ev(()=>{openPin('set');});await ev(()=>pin('222222','222222'));
+  await pg.reload();await pg.waitForTimeout(1300);await helpers();
+  await ev(()=>calcFor('Phạm Văn D','01/01/2025','1 năm'));await ev(()=>closeModal());
+  await ev(()=>{forgotPin();acceptConfirm();});
+  const wiped=await ev(()=>({lock:!!localStorage.getItem(LOCK_KEY),p:loadProfiles().length,h:loadHistory().map(h=>h.name)}));
+  ok(!wiped.lock&&wiped.p===0&&JSON.stringify(wiped.h)==='["Phạm Văn D"]','Quên PIN: xóa dữ liệu đã khóa, tắt khóa, giữ lần tính mới');
+  ok(!(await vis('lockCard')),'  (không còn thẻ khóa)');
+  // 12. Mã PIN 8 số đặt từ bản trước vẫn mở được
+  await ev(()=>enablePin('12345678'));
+  await pg.reload();await pg.waitForTimeout(1300);await helpers();
+  await ev(()=>openPin('unlock'));
+  await ev(()=>pin('12345678'));
+  ok(await ev(()=>!!LOCK.key),'PIN 8 số đặt từ bản v77 vẫn mở khóa được');
+  console.log('Lỗi JS:',errs.length?errs:'không');
+  await b.close();
+})();

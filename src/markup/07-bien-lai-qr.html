@@ -1,0 +1,63 @@
+  <!-- MODAL TRA CỨU BIÊN LAI ĐIỆN TỬ -->
+  <div class="modal-overlay" id="receiptOverlay" onclick="if(event.target===this)closeReceipt()">
+    <div class="modal-box">
+      <div class="modal-scroll">
+        <div class="result-header" style="margin-bottom:16px">🔍 Tra cứu biên lai điện tử</div>
+        <p class="annex-sub">Hệ thống Biên lai điện tử – Bộ Tư pháp (thi hành án dân sự)</p>
+
+        <div class="rc-card">
+          <label class="rc-label">Mã tra cứu biên lai</label>
+          <div class="input-clearable">
+            <input type="text" id="receiptCode" class="rc-input" placeholder="Nhập mã ghi trên biên lai" autocomplete="off" spellcheck="false" oninput="toggleClearBtn(this)" onkeydown="if(event.key==='Enter')lookupReceipt()">
+            <button type="button" class="input-clear-btn" onclick="clearInput('receiptCode')" title="Xóa">✕</button>
+          </div>
+          <div class="rc-actions">
+            <button class="rc-btn scan" onclick="openScanner()">📷 Quét mã QR</button>
+            <button class="rc-btn go" onclick="lookupReceipt()">🔎 Tra cứu</button>
+          </div>
+          <div class="rc-msg" id="receiptMsg"></div>
+        </div>
+
+        <div class="rc-note">
+          <b>Cách dùng:</b> quét mã QR in trên biên lai, hoặc nhập mã tra cứu rồi bấm <b>Tra cứu</b>.
+          Kết quả sẽ mở trên <b>cổng tra cứu chính thức của Bộ Tư pháp</b> để bảo đảm dữ liệu chính xác và có giá trị pháp lý.
+        </div>
+        <div class="rc-note warn">
+          🔒 Phần mềm <b>không lưu và không đọc</b> nội dung biên lai. Mã bạn nhập chỉ dùng để mở trang tra cứu chính thức.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn close" onclick="closeReceipt()" style="flex:none;min-width:100px">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CỬA SỔ CHỌN PHẠM VI ÁP DỤNG CHẾ ĐỘ "NGÀY THỰC" -->
+  <div class="choice-overlay" id="modeChoiceOverlay" onclick="if(event.target===this)closeModeChoice()">
+    <div class="choice-box">
+      <div class="choice-title">Áp dụng theo phần mềm QLPN mới</div>
+      <div class="choice-desc">Cộng ngày lẻ theo <b>lịch thực tế</b> (tháng 28/29/30/31 ngày) thay cho quy ước 30 ngày.<br>Bạn muốn áp dụng cách tính này thế nào?</div>
+      <button type="button" class="choice-btn primary" onclick="chooseRealDay(true)">
+        <span class="choice-btn-main">Luôn áp dụng</span>
+        <span class="choice-btn-sub">Dùng cho tất cả kết quả tính toán lần sau</span>
+      </button>
+      <button type="button" class="choice-btn" onclick="chooseRealDay(false)">
+        <span class="choice-btn-main">Áp dụng lần này</span>
+        <span class="choice-btn-sub">Tính xong sẽ quay về cách tính QLPN cũ</span>
+      </button>
+      <button type="button" class="choice-cancel" onclick="closeModeChoice()">Hủy</button>
+    </div>
+  </div>
+
+  <!-- LỚP QUÉT MÃ QR -->
+  <div class="scan-overlay" id="scanOverlay">
+    <div class="scan-head">
+      <span>Đưa mã QR vào khung</span>
+      <button class="scan-close" onclick="closeScanner()">✕</button>
+    </div>
+    <div class="scan-stage">
+      <video id="scanVideo" playsinline muted></video>
+      <div class="scan-frame"></div>
+    </div>
+    <div class="scan-tip" id="scanTip">Đang khởi động camera…</div>
+  </div>

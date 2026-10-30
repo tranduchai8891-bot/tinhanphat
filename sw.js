@@ -1,9 +1,9 @@
 /* Service Worker - Tính thời hạn chấp hành án phạt tù
    Chiến lược: network-first cho trang chính (luôn lấy bản mới nhất khi có mạng,
    tự động dùng bản đã lưu khi mất mạng), cache-first cho icon.
-   Khi cập nhật app: đổi số CACHE_VERSION bên dưới rồi đẩy lên GitHub. */
+   Khi cập nhật app: đổi số phiên bản trong src/VERSION rồi chạy "npm run build" (tạo lại sw.js). */
 
-const CACHE_VERSION = 'v89';
+const CACHE_VERSION = 'v93';
 const CACHE_NAME = 'tinhanphat-' + CACHE_VERSION;
 
 const ASSETS = [

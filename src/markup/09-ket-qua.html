@@ -1,0 +1,82 @@
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box">
+      <div class="modal-scroll" id="resultScroll">
+        <div class="result-header res-head"><span class="res-head-t">Kết quả tính toán<span class="result-refdate" id="resultRefDate"></span></span><button type="button" class="res-print" onclick="printResultPhieu()">In phiếu</button></div>
+
+        <div class="calc-mode">
+          <div class="calc-mode-btns">
+            <button type="button" class="calc-mode-btn active" id="btnModeQlpn" onclick="setCalcMode('qlpn',true)">Áp dụng theo phần mềm QLPN cũ</button>
+            <button type="button" class="calc-mode-btn" id="btnModeThuc" onclick="askRealDayMode()">Áp dụng theo phần mềm QLPN mới</button>
+          </div>
+          <div class="calc-mode-note" id="calcModeNote">Quy ước <b>30 ngày = 01 tháng</b> khi cộng ngày lẻ (giống phần mềm QLPN cũ).</div>
+        </div>
+
+
+        <div id="resultName" class="result-name" style="display:none"></div>
+
+        <div id="alertBanner" class="alert-banner">
+          <span class="icon" id="alertIcon">⏰</span>
+          <span id="alertText"></span>
+        </div>
+
+        <div class="result-grid">
+          <div class="metric pink"><div class="lbl">Ngày bắt</div><div class="val" id="r-arrest"></div></div>
+          <div class="metric"><div class="lbl lbl-tag"><span class="lbl-txt">Mức án</span><span class="metric-sub" id="r-class" title="Phân loại theo Điều 9 BLHS – suy từ mức án đã tuyên, chỉ mang tính tham khảo"></span></div><div class="val" id="r-original"></div></div>
+          <div class="metric green"><div class="lbl">Tổng được giảm</div><div class="val" id="r-reduced"></div></div>
+          <div class="metric release"><div class="lbl">Ngày hết án dự kiến</div><div class="val" id="r-release"></div></div>
+          <div class="metric blue"><div class="lbl">Thời gian đã chấp hành</div><div class="val" id="r-served"></div></div>
+          <div class="metric lime"><div class="lbl">Thời hạn còn lại</div><div class="val" id="r-remaining"></div></div>
+        </div>
+
+        <div class="progress-section">
+          <div class="progress-label"><span id="progressPct"></span><span id="progressDaysLeft"></span></div>
+          <div class="progress-outer">
+            <div class="progress-wrap">
+              <div class="progress-bar" id="progressBar" style="width:0%"></div>
+              <div class="progress-marker" id="marker25" style="left:25%"></div>
+              <div class="progress-marker" id="marker33" style="left:33.33%"></div>
+              <div class="progress-marker" id="marker50" style="left:50%"></div>
+            </div>
+            <div class="progress-marker-label" style="left:25%">1/4</div>
+            <div class="progress-marker-label" style="left:33.33%">1/3</div>
+            <div class="progress-marker-label" style="left:50%">1/2</div>
+          </div>
+        </div>
+
+        <div class="milestone-box">
+          <div class="tl-title" style="margin-bottom:8px">Ngày đạt các mốc chấp hành (so với mức án ban đầu)</div>
+          <div class="milestone-row"><span class="milestone-tag">1/4 mức án</span><span class="milestone-date" id="m-25"></span></div>
+          <div class="milestone-row"><span class="milestone-tag">1/3 mức án</span><span class="milestone-date" id="m-33"></span></div>
+          <div class="milestone-row"><span class="milestone-tag">1/2 mức án</span><span class="milestone-date" id="m-50"></span></div>
+        </div>
+
+        <div class="eligible-box" id="eligibleBox">
+          <div class="eligible-text" id="eligibleText"></div>
+          <button class="eligible-btn" onclick="openRemissionPage()">🔎 Tra cứu giảm án</button>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-title">Dòng thời gian</div>
+          <div id="timeline"></div>
+        </div>
+      </div>
+
+      <div class="slide-page" id="remissionPage">
+        <div class="slide-page-head">
+          <button class="slide-back-btn" onclick="closeRemissionPage()">‹ Quay lại</button>
+          <div class="slide-page-title">Tra cứu giảm án</div>
+        </div>
+        <div class="slide-page-body" id="remissionPageBody"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn flip-btn" id="actionFlipBtn" onclick="onFlipAction(event)">
+          <span class="flip-inner" id="flipInner">
+            <span class="flip-face flip-front">Sao chép</span>
+            <span class="flip-face flip-back">Lưu hồ sơ</span>
+          </span>
+        </button>
+        <button class="modal-btn close" onclick="closeModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
