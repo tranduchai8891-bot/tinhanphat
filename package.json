@@ -1,0 +1,19 @@
+{
+  "name": "tinhanphat",
+  "version": "93.0.0",
+  "private": true,
+  "description": "Tính thời hạn chấp hành án phạt tù — ứng dụng web chạy không cần mạng (PWA)",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs --check",
+    "test": "node build.mjs --check && node tests/run-all.js",
+    "test:nhanh": "node build.mjs --check && node tests/run-all.js --nhanh",
+    "cap-nhat-mau-chuan": "node tests/regression/so-sanh.js index.html --cap-nhat"
+  },
+  "devDependencies": {
+    "playwright": "1.56.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

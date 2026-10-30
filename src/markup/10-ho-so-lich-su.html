@@ -1,0 +1,44 @@
+  <div class="card" id="lockCard" style="display:none">
+    <div class="lock-row">
+      <div><div class="lock-title">Hồ sơ và lịch sử tra cứu đã khóa</div><div class="lock-sub" id="lockSub"></div></div>
+    </div>
+    <button class="modal-btn close lock-btn" onclick="openPin('unlock')">Mở khóa bằng mã PIN</button>
+  </div>
+
+  <div class="card" id="profileCard" style="display:none">
+    <div class="history-header-row">
+      <div class="card-title" style="margin-bottom:0">Hồ sơ đội phạm nhân<span id="profileCount" class="history-count"></span></div>
+      <div class="history-btn-group">
+        <button class="history-link-btn export" onclick="openExportOpt()">⬇️ Excel</button>
+        <button class="history-link-btn backup" onclick="openShareOpt()">🔄 Chia sẻ dữ liệu</button>
+        <button class="history-link-btn backup" onclick="openSecurity()">Bảo mật</button>
+        <button class="history-link-btn danger" onclick="clearProfiles()">Xóa hết</button>
+        <input type="file" id="profImportInput" accept=".json,application/json" style="display:none" onchange="importProfilesFile(this)">
+        <input type="file" id="xlImportInput" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" style="display:none" onchange="importExcelFile(this)">
+      </div>
+    </div>
+    <div class="history-list" id="profileList"></div>
+  </div>
+
+  <div class="card" id="historyCard" style="display:none">
+    <div class="history-header-row">
+      <div class="card-title" style="margin-bottom:0">Lịch sử tra cứu<span id="historyCount" class="history-count"></span></div>
+      <div class="history-btn-group">
+        <button class="history-link-btn export" onclick="exportHistoryToExcel()">⬇️ Xuất Excel</button>
+        <button class="history-link-btn backup" onclick="openSecurity()">Bảo mật</button>
+        <button class="history-link-btn danger" id="btnClearHistory" onclick="clearHistory()">Xóa hết</button>
+      </div>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <!-- MODAL LỊCH SỬ -->
+  <div class="modal-overlay" id="historyDetailOverlay" onclick="if(event.target===this)closeHistoryDetail()">
+    <div class="modal-box">
+      <div class="modal-scroll" id="historyDetailContent"></div>
+      <div class="modal-actions">
+        <button class="modal-btn copy" onclick="copyHistoryText(event)">📋 Sao chép</button>
+        <button class="modal-btn close" onclick="closeHistoryDetail()">Đóng</button>
+      </div>
+    </div>
+  </div>

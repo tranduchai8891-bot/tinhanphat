@@ -1,0 +1,94 @@
+<div class="app">
+
+  <div class="header">
+    <div class="logo-wrap">
+      <img class="logo-img" src="{{asset:logo-cand.png}}" alt="Logo Cong an nhan dan Viet Nam">
+      <div class="header-text">
+        <div class="header-org">Công an nhân dân Việt Nam</div>
+        <div class="header-title">Tính thời hạn<br>chấp hành án phạt tù</div>
+      </div>
+    </div>
+    <div class="header-sub">Tra cứu ngày hết án và thời gian còn lại sau giảm án</div>
+  </div>
+  <div class="header-band"></div>
+  <div class="ticker"><div class="ticker-txt">Tính năng Tra cứu giảm án chỉ mang tính chất tham khảo, cần đối chiếu với các Văn bản đang có hiệu lực pháp luật. Kết quả tính toán ngày hết án được tính theo 2 tuỳ chọn, đồng chí có thể lựa chọn phương pháp phù hợp với đơn vị mình.</div></div>
+
+  <div class="card form-card">
+    <div class="form-section">
+      <div class="card-title">Thông tin bắt giam &amp; bản án</div>
+      <div class="field">
+        <label>Tên phạm nhân <span class="label-opt">(viết tắt, không bắt buộc)</span></label>
+        <div class="input-clearable">
+          <input type="text" id="prisonerName" class="date-single-input" placeholder="VD: N.V.A" maxlength="40" autocapitalize="words" oninput="capitalizeName(this);toggleClearBtn(this)">
+          <button type="button" class="input-clear-btn" onclick="clearInput('prisonerName')" title="Xóa">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Ngày bắt / bắt đầu chấp hành án</label>
+        <div class="input-clearable">
+          <input type="text" id="arrestDateText" class="date-single-input" placeholder="ngày/tháng/năm" inputmode="numeric" maxlength="10" oninput="formatDateInput(this);toggleClearBtn(this)" onblur="expandYearOnBlur(this)">
+          <button type="button" class="input-clear-btn" onclick="clearInput('arrestDateText')" title="Xóa">✕</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="label-row">
+          <label style="margin-bottom:0">Mức án</label>
+          <button type="button" class="field-clear-btn" onclick="clearGroup(['sY','sM','sD'])" title="Xóa">Xóa</button>
+        </div>
+        <div class="row3">
+          <div><input type="text" inputmode="numeric" id="sY" placeholder="năm" data-unit="năm" data-max="30" onfocus="stripUnit(this)" onblur="addUnit(this)" oninput="clampSentence(this)"></div>
+          <div><input type="text" inputmode="numeric" id="sM" placeholder="tháng" data-unit="tháng" data-max="11" onfocus="stripUnit(this)" onblur="addUnit(this)" oninput="clampSentence(this)"></div>
+          <div><input type="text" inputmode="numeric" id="sD" placeholder="ngày" data-unit="ngày" data-max="29" onfocus="stripUnit(this)" onblur="addUnit(this)" oninput="clampSentence(this)"></div>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <div class="label-row">
+          <label style="margin-bottom:0">Thời gian tạm giam trước đó</label>
+          <button type="button" class="field-clear-btn" onclick="clearGroup(['pdY','pdM','pdD'])" title="Xóa">Xóa</button>
+        </div>
+        <div class="row3">
+          <div><input type="text" inputmode="numeric" id="pdY" placeholder="năm" data-unit="năm" data-max="30" onfocus="stripUnit(this)" onblur="addUnit(this)" oninput="clampPreDet(this)"></div>
+          <div><input type="text" inputmode="numeric" id="pdM" placeholder="tháng" data-unit="tháng" data-max="999" onfocus="stripUnit(this)" onblur="addUnit(this)" oninput="clampPreDet(this)"></div>
+          <div><input type="text" inputmode="numeric" id="pdD" placeholder="ngày" data-unit="ngày" data-max="9999" onfocus="stripUnit(this)" onblur="addUnit(this)" oninput="clampPreDet(this)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <div class="form-section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="card-title" style="margin-bottom:0;display:flex;align-items:baseline;flex-wrap:wrap">Các kỳ giảm án<span class="rm-chip" id="rmPickChip"></span></div>
+        <button class="link-clear" onclick="clearRemissions()">Xóa hết</button>
+      </div>
+      <div id="remissionList" class="remission-list-inline"></div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <div class="form-section">
+      <div class="card-title">Tính đến ngày</div>
+      <div class="ref-date-toggle">
+        <button type="button" class="ref-date-btn active" id="btnRefToday" onclick="setRefMode('today')">Ngày hiện tại</button>
+        <button type="button" class="ref-date-btn" id="btnRefCustom" onclick="setRefMode('custom')">Ngày giả định</button>
+      </div>
+      <div class="field" id="refDateField" style="display:none;margin-top:10px;margin-bottom:0">
+        <label>Chọn ngày giả định</label>
+        <div class="input-clearable">
+          <input type="text" id="refDate" class="date-single-input" placeholder="ngày/tháng/năm" inputmode="numeric" maxlength="10" oninput="formatDateInput(this);toggleClearBtn(this)" onblur="expandYearOnBlur(this)">
+          <button type="button" class="input-clear-btn" onclick="clearInput('refDate')" title="Xóa">✕</button>
+        </div>
+      </div>
+      <button type="button" class="ref-date-btn esc-open-btn" id="btnEscape" onclick="openEscape()">Trốn/tạm đình chỉ</button>
+      <div class="esc-summary" id="escSummary"></div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-calc" onclick="calculate()"><span class="btn-calc-txt">Tính án phạt</span></button>
+    <div class="action-annex">
+      <button class="btn-annex" onclick="openAnnex()">📋 Phụ lục điều kiện xét giảm thời hạn chấp hành án</button>
+      <button class="btn-annex" onclick="openDecree()">📖 Mục 4 - Nghị định 170 (Xếp loại CHAPT)</button>
+      <button class="btn-annex" onclick="openReceipt()">🔍 Tra cứu biên lai điện tử (Bộ Tư pháp)</button>
+    </div>
+  </div>

@@ -1,0 +1,39 @@
+  <!-- POPUP THỜI GIAN TRỐN / TẠM ĐÌNH CHỈ -->
+  <div class="modal-overlay" id="escOverlay" style="z-index:2100" onclick="if(event.target===this)closeEscape()">
+    <div class="modal-box" style="max-width:420px">
+      <div class="modal-scroll">
+        <div class="result-header" style="margin-bottom:12px">Thời gian trốn/tạm đình chỉ</div>
+        <div id="escRows"></div>
+        <button type="button" class="esc-add" id="escAddBtn" onclick="addEscRow()">+ Thêm lần</button>
+        <div class="esc-total" id="escTotal"></div>
+        <div class="sec-msg" id="escMsg"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn ghost" onclick="clearEscAll()">Xóa hết</button>
+        <button class="modal-btn close" onclick="saveEscape()">Xong</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHỌN KỲ GIẢM ĐÃ ĐƯỢC XÉT (Khoản 7) -->
+  <div class="modal-overlay" id="k7PickOverlay" onclick="if(event.target===this)closeK7Pick()">
+    <div class="modal-box" style="max-width:420px">
+      <div class="modal-scroll">
+        <div class="result-header" style="margin-bottom:6px">Kỳ giảm đã được xét</div>
+        <p class="annex-sub" style="margin:0 0 12px">Chọn kỳ mà phạm nhân đã được giảm án gần nhất để đối chiếu theo Khoản 7. Có thể bỏ qua nếu chưa cần.</p>
+        <div class="k7pick-list" id="k7PickList"></div>
+        <div class="k7pick-date">
+          <label for="k7PickDate">Ngày xét thực tế</label>
+          <div class="input-clearable">
+            <input type="text" id="k7PickDate" class="date-single-input" placeholder="ngày/tháng/năm" inputmode="numeric" maxlength="10" oninput="formatDateInput(this);toggleClearBtn(this)" onfocus="toggleClearBtn(this)" onblur="expandYearOnBlur(this);toggleClearBtn(this)">
+            <button type="button" class="input-clear-btn" onclick="clearInput('k7PickDate')" title="Xóa">✕</button>
+          </div>
+          <div class="k7pick-note">Chọn đợt ở trên để điền sẵn ngày; có thể sửa lại cho đúng ngày xét thực tế của đợt đó.</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn ghost" onclick="closeK7Pick()">Đóng</button>
+        <button class="modal-btn close" onclick="confirmK7Pick()">Chọn</button>
+      </div>
+    </div>
+  </div>
