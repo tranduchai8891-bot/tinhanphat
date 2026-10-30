@@ -173,7 +173,8 @@ function openPin(mode,after){
   setTimeout(()=>{if(!a.disabled)a.focus();},120);
 }
 function setPinEye(el,show){
-  const btn=el.parentNode.querySelector('.pin-eye'), t=show?'Ẩn mã PIN':'Hiện mã PIN';
+  const what=el.classList.contains('pw')?'mật khẩu':'mã PIN';
+  const btn=el.parentNode.querySelector('.pin-eye'), t=(show?'Ẩn ':'Hiện ')+what;
   el.type=show?'text':'password';
   btn.classList.toggle('on',show);
   btn.querySelector('use').setAttribute('href',show?'#ic-eye-off':'#ic-eye');
@@ -303,33 +304,84 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 // ----- File sao lưu .json có mật khẩu -----
-let pwMode=null, pwAfter=null;
+// Khi xuất, phần mềm tạo sẵn mật khẩu mạnh: 12 ký tự chữ thường và số (bỏ các ký tự dễ nhầm 0/o, 1/l/i),
+// chia 3 nhóm cho dễ đọc, khoảng 59 bit ngẫu nhiên. Người dùng vẫn có thể tự đặt mật khẩu riêng từ PW_MIN ký tự.
+// Khi nhập file thì không giới hạn độ dài, để file cũ (mật khẩu 6 ký tự) vẫn mở được.
+const PW_CHARS='abcdefghjkmnpqrstuvwxyz23456789', PW_MIN=10;
+let pwMode=null, pwAfter=null, pwGen='', pwCopied=false;
+function genPassword(){
+  const out=[], buf=new Uint8Array(16);
+  while(out.length<12){
+    crypto.getRandomValues(buf);
+    for(const x of buf)if(x<248&&out.length<12)out.push(PW_CHARS[x%31]);   // 248 = 8×31: bỏ phần dư để mọi ký tự đều nhau
+  }
+  return out.slice(0,4).join('')+'-'+out.slice(4,8).join('')+'-'+out.slice(8).join('');
+}
+function pwSay(t,good){const m=document.getElementById('pwMsg');m.textContent=t||'';m.classList.toggle('ok',!!good);}
+function newPassword(){
+  pwGen=genPassword(); pwCopied=false;
+  const a=document.getElementById('pwA');
+  a.value=pwGen; setPinEye(a,true);
+  document.getElementById('pwB').value='';
+  pwEdited();
+}
+// Tự đặt mật khẩu riêng (khác mật khẩu tạo sẵn) thì phải nhập lại lần 2 để chắc chắn không gõ nhầm
+function pwEdited(){
+  if(pwMode!=='export')return;
+  const own=document.getElementById('pwA').value!==pwGen;
+  document.getElementById('pwBWrap').style.display=own?'':'none';
+  document.getElementById('pwCopy').style.display=own?'none':'';
+  pwSay('');
+}
+function copyText(text){
+  return new Promise(res=>{
+    const fb=()=>{try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');document.body.removeChild(ta);res(!!ok);}catch(e){res(false);}};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>res(true),fb);else fb();
+  });
+}
+async function copyPassword(){
+  const v=document.getElementById('pwA').value;
+  if(!v)return;
+  pwCopied=await copyText(v);
+  pwSay(pwCopied?'Đã sao chép mật khẩu. Hãy lưu lại ở nơi an toàn.':'Không sao chép tự động được — hãy ghi lại mật khẩu trên.',pwCopied);
+}
 function openPassword(mode,after){
-  pwMode=mode; pwAfter=after;
-  document.getElementById('pwTitle').textContent=mode==='export'?'Đặt mật khẩu cho file':'Mật khẩu của file';
-  document.getElementById('pwNote').textContent=mode==='export'
-    ?'File dữ liệu luôn được mã hóa. Người nhận phải có mật khẩu này mới nhập được (ít nhất 6 ký tự). Gửi mật khẩu qua kênh khác với file.'
+  pwMode=mode; pwAfter=after; pwGen=''; pwCopied=false;
+  const exp=mode==='export';
+  document.getElementById('pwTitle').textContent=exp?'Mật khẩu cho file':'Mật khẩu của file';
+  document.getElementById('pwNote').textContent=exp
+    ?'File dữ liệu luôn được mã hóa. Phần mềm đã tạo sẵn mật khẩu mạnh — bấm "Sao chép", lưu lại và gửi cho người nhận qua kênh khác với file. Có thể tự đặt mật khẩu riêng từ '+PW_MIN+' ký tự.'
     :'File này đã được mã hóa. Nhập mật khẩu do người gửi cung cấp.';
   const a=document.getElementById('pwA'), b=document.getElementById('pwB');
-  a.value=''; b.value=''; b.style.display=mode==='export'?'':'none';
-  document.getElementById('pwMsg').textContent='';
+  a.value=''; b.value=''; setPinEye(a,false); setPinEye(b,false);
+  document.getElementById('pwTools').style.display=exp?'':'none';
+  document.getElementById('pwBWrap').style.display='none';
+  pwSay('');
+  if(exp)newPassword();
   document.getElementById('pwOverlay').style.display='flex';
-  setTimeout(()=>a.focus(),120);
+  if(!exp)setTimeout(()=>a.focus(),120);
 }
-function closePassword(){document.getElementById('pwOverlay').style.display='none';pwMode=null;pwAfter=null;}
+function closePassword(){
+  document.getElementById('pwOverlay').style.display='none';pwMode=null;pwAfter=null;pwGen='';pwCopied=false;
+  ['pwA','pwB'].forEach(id=>{const el=document.getElementById(id);el.value='';setPinEye(el,false);});
+}
 async function confirmPassword(){
   const a=document.getElementById('pwA').value, b=document.getElementById('pwB').value;
-  const msg=document.getElementById('pwMsg'), btn=document.getElementById('pwOk');
+  const btn=document.getElementById('pwOk');
+  const gen=pwMode==='export'&&!!pwGen&&a===pwGen;
   if(pwMode==='export'){
-    if(a.length<6){msg.textContent='Mật khẩu cần ít nhất 6 ký tự.';return;}
-    if(a!==b){msg.textContent='Hai lần nhập mật khẩu chưa khớp.';return;}
-  }else if(!a){msg.textContent='Vui lòng nhập mật khẩu.';return;}
-  btn.disabled=true; msg.textContent='Đang xử lý…';
+    if(!gen){
+      if(a.length<PW_MIN){pwSay('Mật khẩu tự đặt cần ít nhất '+PW_MIN+' ký tự.');return;}
+      if(a!==b){pwSay('Hai lần nhập mật khẩu chưa khớp.');return;}
+    }else if(!pwCopied)pwCopied=await copyText(a);   // mật khẩu tạo sẵn: tự sao chép để không bị mất
+  }else if(!a){pwSay('Vui lòng nhập mật khẩu.');return;}
+  btn.disabled=true; pwSay('Đang xử lý…');
   try{
-    const ok=await pwAfter(a);
-    if(ok===false){msg.textContent='Mật khẩu không đúng hoặc file đã bị sửa.';return;}
+    const ok=await pwAfter(a,{generated:gen,copied:pwCopied});
+    if(ok===false){pwSay('Mật khẩu không đúng hoặc file đã bị sửa.');return;}
     closePassword();
-  }catch(e){msg.textContent='Có lỗi: '+e.message;}
+  }catch(e){pwSay('Có lỗi: '+e.message);}
   finally{btn.disabled=false;}
 }
 async function encryptPack(password,pack){

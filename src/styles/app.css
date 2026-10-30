@@ -628,6 +628,7 @@ body.typing .bottom-nav{transform:translateY(120%)}
 .pr-note{font-style:italic;font-size:11pt}
 .date-single-input.invalid,.row3 input.invalid{border-color:#c62828!important;background:#fff5f5}
 .field-err{font-size:11.5px;font-weight:600;color:#c62828;margin-top:5px;line-height:1.4}
+.date-adjust{font-size:11.5px;font-weight:600;color:#9a5800;margin-top:5px;line-height:1.4}
 html.big .app,html.big .modal-box,html.big .qpick-box,html.big .qw-box,html.big .choice-box,html.big .bottom-nav{zoom:1.12}
 html.big .modal-box{max-height:calc(100% / 1.12)}
 html.big .esc-grid{grid-template-columns:1fr}
@@ -694,6 +695,11 @@ html.big #teamOverlay,html.big #reviewOverlay,html.big #gradeOverlay{padding-bot
 .sec-opt{text-align:center;padding:12px 13px}
 .sec-opt .exp-opt-t{margin-bottom:0}
 .sec-msg{min-height:16px;font-size:11.5px;font-weight:700;color:#b91c1c;text-align:center;margin-top:6px}
+.sec-msg.ok{color:#1d6f42}
+.pw-tools{display:flex;gap:8px;margin-top:8px}
+.pw-tool{flex:1;height:36px;border:1.5px solid #c9ced8;border-radius:9px;background:#fff;color:#7f1d1d;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.pw-tool:active{background:#f6f1f1}
+.pin-input.pw[type=text]{letter-spacing:1.5px}
 #pinMsg{white-space:pre-line;line-height:1.5}
 #pinOk:disabled{opacity:.45;cursor:not-allowed}
 .pin-input:disabled{background:#f1f2f4;border-color:#d7dbe1}

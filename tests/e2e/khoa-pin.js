@@ -123,7 +123,7 @@ const SP=require('os').tmpdir()+'/';
   await ev(()=>exportProfilesFile());
   ok(await vis('pwOverlay'),'Xuất dữ liệu: bắt buộc đặt mật khẩu');
   await ev(()=>{document.getElementById('pwA').value='abc';document.getElementById('pwB').value='abc';return confirmPassword();});
-  ok((await ev(()=>document.getElementById('pwMsg').textContent)).includes('6 ký tự'),'Mật khẩu quá ngắn bị từ chối');
+  ok((await ev(()=>document.getElementById('pwMsg').textContent)).includes('10 ký tự'),'Mật khẩu tự đặt quá ngắn bị từ chối');
   const [dl]=await Promise.all([pg.waitForEvent('download'),ev(()=>{document.getElementById('pwA').value='matkhau-2026';document.getElementById('pwB').value='matkhau-2026';return confirmPassword();})]);
   const out=SP+'enc-'+dl.suggestedFilename();await dl.saveAs(out);
   const raw=fs.readFileSync(out,'utf8');const j=JSON.parse(raw);

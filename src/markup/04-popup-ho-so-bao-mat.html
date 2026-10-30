@@ -83,8 +83,18 @@
     <div class="qpick-box">
       <div class="qpick-title" id="pwTitle">Mật khẩu file</div>
       <p class="sec-note" id="pwNote"></p>
-      <input type="password" id="pwA" class="pin-input pw" autocomplete="new-password" maxlength="64" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')confirmPassword()">
-      <input type="password" id="pwB" class="pin-input pw" autocomplete="new-password" maxlength="64" placeholder="Nhập lại mật khẩu" onkeydown="if(event.key==='Enter')confirmPassword()">
+      <div class="pin-wrap">
+        <input type="password" id="pwA" class="pin-input pw" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="64" placeholder="Mật khẩu" oninput="pwEdited()" onkeydown="if(event.key==='Enter')confirmPassword()">
+        <button type="button" class="pin-eye" onmousedown="event.preventDefault()" onclick="togglePinEye('pwA',this)" title="Hiện mật khẩu" aria-label="Hiện mật khẩu"><svg class="ic-eye" aria-hidden="true"><use href="#ic-eye"/></svg></button>
+      </div>
+      <div class="pw-tools" id="pwTools">
+        <button type="button" class="pw-tool" id="pwCopy" onclick="copyPassword()">Sao chép</button>
+        <button type="button" class="pw-tool" onclick="newPassword()">Tạo mật khẩu khác</button>
+      </div>
+      <div class="pin-wrap" id="pwBWrap">
+        <input type="password" id="pwB" class="pin-input pw" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="64" placeholder="Nhập lại mật khẩu" onkeydown="if(event.key==='Enter')confirmPassword()">
+        <button type="button" class="pin-eye" onmousedown="event.preventDefault()" onclick="togglePinEye('pwB',this)" title="Hiện mật khẩu" aria-label="Hiện mật khẩu"><svg class="ic-eye" aria-hidden="true"><use href="#ic-eye"/></svg></button>
+      </div>
       <div class="sec-msg" id="pwMsg"></div>
       <div style="display:flex;gap:8px;margin-top:10px">
         <button class="modal-btn ghost" style="flex:1" onclick="closePassword()">Hủy</button>
