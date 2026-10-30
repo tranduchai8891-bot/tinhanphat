@@ -61,6 +61,12 @@ const [,,file,outFile,NS='120',PURE='1']=process.argv;
       calculate();
     },inp);
     await pg.waitForTimeout(30);
+    // Khi báo lỗi tại ô nhập, app tự đặt con trỏ vào ô đó sau 250 ms. Chờ bước này xong rồi bỏ chọn ô,
+    // để kịch bản sau không phụ thuộc tốc độ máy (con trỏ đặt nhầm lúc đang điền kịch bản sau sẽ bỏ chữ "năm").
+    if(await ev(()=>!!document.querySelector('.field-err'))){
+      await pg.waitForTimeout(320);
+      await ev(()=>{const a=document.activeElement;if(a&&a.blur)a.blur();});
+    }
     // Popup chọn kỳ giảm đã xét
     const k7open=await ev(()=>document.getElementById('k7PickOverlay').style.display==='flex');
     if(k7open){
