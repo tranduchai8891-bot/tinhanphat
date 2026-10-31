@@ -1,6 +1,6 @@
 {
   "name": "tinhanphat",
-  "version": "94.0.0",
+  "version": "95.0.0",
   "private": true,
   "description": "Tính thời hạn chấp hành án phạt tù — ứng dụng web chạy không cần mạng (PWA)",
   "scripts": {

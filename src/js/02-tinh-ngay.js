@@ -90,7 +90,10 @@ function fmtDays(months,days){
 }
 
 // Luôn hiển thị đủ 3 đơn vị (năm/tháng/ngày) theo lịch thực, cho phần "còn lại"
+// Hiển thị "thời gian đã chấp hành" và "thời hạn còn lại": đủ "x năm y tháng z ngày";
+// riêng khi 0 năm 0 tháng thì ghi gọn "z ngày" (0 năm 0 tháng 0 ngày -> "0 ngày").
 function fmtDaysFull(diffObj){
+  if(!diffObj.years&&!diffObj.months)return (diffObj.days||0)+' ngày';
   return diffObj.years+' năm '+diffObj.months+' tháng '+diffObj.days+' ngày';
 }
 

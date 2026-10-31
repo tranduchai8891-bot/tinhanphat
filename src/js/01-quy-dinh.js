@@ -8,14 +8,16 @@
 // cố định trong HTML, cần sửa tay cho khớp nếu thay đổi.
 // =====================================================================================
 const QUY_DINH={
-  // Các đợt xét giảm thời hạn chấp hành án trong năm và ngày xét cố định
+  // Các đợt xét giảm thời hạn chấp hành án trong năm và ngày xét cố định.
+  // tuThang: một ngày bất kỳ (ngày xét thực tế, ngày quyết định giảm...) từ tháng này đến trước tuThang của đợt kế tiếp
+  // được quy về đợt đó: 30/4 - 1/5: tháng 3-5; Quốc khánh 2/9: tháng 6-10; Tết Nguyên Đán: tháng 11-12 và 1-2 năm sau.
   dotXet:[
-    {name:'30/4 - 1/5',     reviewMonth:3,  reviewDay:15},
-    {name:'Quốc khánh 2/9', reviewMonth:7,  reviewDay:15},
-    {name:'Tết Nguyên Đán', reviewMonth:12, reviewDay:15}
+    {name:'30/4 - 1/5',     reviewMonth:3,  reviewDay:15, tuThang:3},
+    {name:'Quốc khánh 2/9', reviewMonth:7,  reviewDay:15, tuThang:6},
+    {name:'Tết Nguyên Đán', reviewMonth:12, reviewDay:15, tuThang:11}
   ],
   // Điều kiện thời gian đã chấp hành (1/mẫu số của mức án, có trừ tạm giam)
-  mocThuong:3,               // 1/3 mức án — Điều 5 Nghị quyết 03
+  mocThuong:3,               // 1/3 mức án — Điều 5 Nghị quyết 03/2024/NQ-HĐTP
   mocChuaThanhNien:4,        // 1/4 mức án — Điều 123 Luật Tư pháp người chưa thành niên
   mocKhoan9:[1,2],           // ≥ 1/2 mức hình phạt chung — Khoản 9 (tội ít nghiêm trọng do cố ý)
   mocKhoan10:[2,3],          // ≥ 2/3 mức hình phạt chung — Khoản 10 (tội nghiêm trọng trở lên)
@@ -29,7 +31,9 @@ const QUY_DINH={
   tienAn:{nguongThang:36, quyAnNho:1, quyAnLon:2},   // án ≤ 36 tháng: +1 quý; trên 36 tháng: +2 quý
   // Khoản 5 (xếp loại không liên tục, án trên 05 năm): [mức án TRÊN ... năm, cộng thêm tổng quý, số quý liền kề]
   khoan5:[[10,2,4],[5,1,2]],
-  // Khoản 7: đã được giảm án — xét đợt tiếp: đủ 04 quý Khá, ≥ 02 quý liền kề; cách lần trước ≥ 01 năm
+  // Khoản 7: đã được giảm án — xét đợt tiếp: đủ 04 quý Khá, ≥ 02 quý liền kề.
+  // cachNam: mỗi năm chỉ được xét giảm tối đa 01 lần (Điều 12 Thông tư liên tịch 02/2021/TTLT-TANDTC-VKSNDTC-BCA-BQP):
+  // được giảm ở đợt nào thì sớm nhất được xét lại vào CÙNG ĐỢT của năm sau (không cần đủ tròn 12 tháng).
   khoan7:{tongQuy:4, lienKe:2, cachNam:1},
   // Điều 21 Nghị định 170/2026/NĐ-CP: tháng được xếp loại khi chấp hành ≥ 21 ngày; quý cần ≥ 02 tháng
   ngayToiThieuTrongThang:21,

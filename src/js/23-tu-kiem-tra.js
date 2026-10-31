@@ -13,9 +13,9 @@ const SELFTEST_FINGERPRINTS={
   "Quý đủ điều kiện xếp loại (completedQuarters)":"f8efce41",
   "Đợt xét giảm án (findEligibleReview)":"23f17c8a",
   "Hiển thị năm/tháng/ngày (fmtDays, addYMD)":"69f1291e",
-  "Hồ sơ cập nhật theo ngày (liveProfileValues)":"2686c1da",
+  "Hồ sơ cập nhật theo ngày (liveProfileValues)":"4373a526",
   "Tự xếp loại Điều 25, 26 (autoGrades)":"0a031ee9",
-  "Kết luận xét giảm án (evaluateRemission)":"6da9f4dd",
+  "Kết luận xét giảm án (evaluateRemission)":"36384ee6",
   "Trốn/tạm đình chỉ (computeSentence)":"a3ed1e8b"
 };
 
@@ -70,7 +70,13 @@ function selfTestCases(){
     ['Án đã hết — bắt 09/03/1984, án 6 năm 6 tháng 20 ngày, trốn 13/11/1985-29/03/1986, tính đến 30/10/2026',
       ()=>{const r=escCase(D(9,3,1984),78,20,[{from:'13/11/1985',to:'29/03/1986'}],D(30,10,2026));
         return 'hết án '+fmtDate(r.releaseDate)+' | đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
-      'hết án 15/02/1991 | đã chấp hành 6 năm 6 tháng 20 ngày | còn lại 0 năm 0 tháng 0 ngày']
+      'hết án 15/02/1991 | đã chấp hành 6 năm 6 tháng 20 ngày | còn lại 0 năm 0 tháng 0 ngày'],
+    ['Hiển thị gọn khi 0 năm 0 tháng: 0 năm 0 tháng 17 ngày / 0 năm 0 tháng 0 ngày / 0 năm 3 tháng 5 ngày',
+      ()=>[{years:0,months:0,days:17},{years:0,months:0,days:0},{years:0,months:3,days:5}].map(fmtDaysFull).join(' / '),
+      '17 ngày / 0 ngày / 0 năm 3 tháng 5 ngày'],
+    ['Khoản 7 — đợt sớm nhất được xét tiếp (cùng đợt năm sau): đã giảm với ngày xét thực tế 20/07/2025 / 23/04/2027 / 10/01/2028',
+      ()=>[D(20,7,2025),D(23,4,2027),D(10,1,2028)].map(d=>{const n=k7EarliestNext(d);return shortReviewLabel(reviewRoundOf(n).name,n)+' ('+fmtDate(n)+')';}).join(' / '),
+      '2/9/2026 (15/07/2026) / 30/4-1/5/2028 (15/03/2028) / Tết Nguyên Đán 2029 (15/12/2028)']
   ];
 }
 const ESC_EX=[{from:'13/11/1985',to:'29/03/1986'},{from:'02/04/1986',to:'11/09/2026'}];
@@ -204,7 +210,13 @@ function selfTestRemissionCases(){
     ['Khoản 6: như trên nhưng có 01 tiền án (+2 quý)', ev(E(D(1,3,2022),48),X({arrival:ARR,penalty:1,grades:{'2026-I':'Kem'}})), "◷ Đủ thời gian — chưa đủ xếp loạiĐã đạt mốc 1/3 mức án nhưng mới có 2/4 quý Khá liên tục liền kề; còn thiếu 2 quý xếp loại Khá. Nếu các quý tiếp theo đều đạt Khá trở lên, dự kiến đủ điều kiện đề nghị xét giảm vào đợt Quốc khánh 2/9 (15/07/2027)."],
     ['Điều 123: chưa thành niên, án 6 năm, bắt 01/03/2024, tính đến 10/01/2026', ev(E(D(1,3,2024),72,0,0,0,D(10,1,2026)),X({priority:true,arrival:D(15,3,2024)})), "✓ Đủ điều kiện xét giảm ánĐã đủ điều kiện về thời gian (1/4 mức án) và xếp loại: 7/2 quý Khá liên tục liền kề. Đề nghị xét giảm tại đợt 30/4-1/5/2026 (ngày xét 15/03/2026). Số quý xếp loại tính từ ngày đến trại 15/03/2024 theo Điều 21. Lưu ý đối chiếu thêm điều kiện về biến động và các quy định hiện hành."],
     ['Như trên nhưng không phải người chưa thành niên', ev(E(D(1,3,2024),72,0,0,0,D(10,1,2026)),X({arrival:D(15,3,2024)})), "Chưa đủ điều kiện xét giảmChưa đạt mốc thời gian 1/3 mức án (dự kiến đạt ngày 01/03/2026). Đợt xét sớm nhất có thể được đề nghị: 30/4 - 1/5 (15/03/2026)."],
-    ['Khoản 7: kỳ giảm gần nhất 15/07/2026 (chưa đủ 01 năm)', ev(A6,X({arrival:ARR,k7:{on:true,value:D(15,7,2026).getTime(),label:'Quốc khánh 2/9 (ngày xét 15/07/2026)'}})), "◷ Đã được giảm án — chờ đợt tiếp theoKỳ giảm gần nhất: 2/9/2026 (ngày xét 15/07/2026). Dự kiến kỳ giảm tiếp theo vào đợt 2/9/2027 (ngày xét 15/07/2027), nếu bảo đảm đủ điều kiện xếp loại."],
+    ['Khoản 7: kỳ giảm gần nhất 15/07/2026 (chưa tới đợt 2/9 năm sau)', ev(A6,X({arrival:ARR,k7:{on:true,value:D(15,7,2026).getTime(),label:'Quốc khánh 2/9 (ngày xét 15/07/2026)'}})), "◷ Đã được giảm án — chờ đợt tiếp theoKỳ giảm gần nhất: 2/9/2026 (ngày xét 15/07/2026). Dự kiến kỳ giảm tiếp theo vào đợt 2/9/2027 (ngày xét 15/07/2027), nếu bảo đảm đủ điều kiện xếp loại."],
+    ['Khoản 7: giảm đợt 2/9/2025, ngày xét thực tế 20/07/2025; tính đến 01/06/2026 (Điều 12 TTLT 02/2021: cùng đợt năm sau)',
+      ev(E(D(1,3,2022),72,0,0,0,D(1,6,2026)),X({arrival:ARR,k7:{on:true,value:D(15,7,2025).getTime(),label:'Quốc khánh 2/9 (ngày xét 15/07/2025)',date:D(20,7,2025)}})),
+      "◷ Đã được giảm án — chờ đợt tiếp theoKỳ giảm gần nhất: 2/9/2025 (ngày xét 20/07/2025). Dự kiến kỳ giảm tiếp theo vào đợt 2/9/2026 (ngày xét 15/07/2026), nếu bảo đảm đủ điều kiện xếp loại."],
+    ['Khoản 7: như trên, nhập ngày quyết định 28/08/2025 thay cho ngày xét',
+      ev(E(D(1,3,2022),72,0,0,0,D(1,6,2026)),X({arrival:ARR,k7:{on:true,value:D(15,7,2025).getTime(),label:'Quốc khánh 2/9 (ngày xét 15/07/2025)',date:D(28,8,2025)}})),
+      "◷ Đã được giảm án — chờ đợt tiếp theoKỳ giảm gần nhất: 2/9/2025 (ngày xét 28/08/2025). Dự kiến kỳ giảm tiếp theo vào đợt 2/9/2026 (ngày xét 15/07/2026), nếu bảo đảm đủ điều kiện xếp loại."],
     ['Khoản 7: kỳ giảm gần nhất 15/12/2024, các quý sau đó đều Khá', ev(A6,X({arrival:ARR,k7:{on:true,value:D(15,12,2024).getTime(),label:'Tết Nguyên Đán (ngày xét 15/12/2024)'}})), "✓ Đủ điều kiện xét giảm ánĐã đủ điều kiện về thời gian (1/3 mức án) và xếp loại: liên tục xếp loại Khá (7 quý kể từ kỳ giảm 15/12/2024). Đề nghị xét giảm tại đợt Tết Nguyên Đán 2027 (ngày xét 15/12/2026). Số quý xếp loại tính từ ngày đến trại 15/03/2022 theo Điều 21. Lưu ý đối chiếu thêm điều kiện về biến động và các quy định hiện hành."],
     ['Khoản 8: chưa chọn hình thức kỷ luật', ev(A6,X({arrival:ARR,k8:{on:true}})), "◷ Chờ thông tin Khoản 8Vui lòng chọn hình thức kỷ luật và nhập ngày công nhận đã cải tạo tiến bộ để đối chiếu."],
     ['Khoản 8: kỷ luật 10/01/2024, công nhận tiến bộ 20/03/2024 (cần 04 quý)', ev(A6,X({arrival:ARR,k8:{on:true,need:4,dec:D(10,1,2024),date:D(20,3,2024)}})), "✓ Đủ điều kiện xét giảm ánĐã được công nhận cải tạo tiến bộ ngày 20/03/2024 và có 8/4 quý liền kề xếp loại Khá trở lên theo Khoản 8. Đề nghị xét giảm tại đợt Tết Nguyên Đán 2027 (ngày xét 15/12/2026). Lưu ý đối chiếu thêm điều kiện về biến động và các quy định hiện hành."],

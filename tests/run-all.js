@@ -16,7 +16,8 @@ const SUITES=[
   ['Nhập hồ sơ từ Excel/CSV','e2e/nhap-excel.js'],
   ['Báo lỗi tại ô nhập, chữ lớn','e2e/bao-loi-chu-lon.js'],
   ['Nhập ngày, mật khẩu file xuất','e2e/nhap-ngay-mat-khau.js'],
-  ['Án đã hết: dừng ở mức án','e2e/an-da-het.js']
+  ['Án đã hết: dừng ở mức án','e2e/an-da-het.js'],
+  ['Định dạng gọn, Khoản 7 cùng đợt năm sau','e2e/dinh-dang-gon-khoan-7.js']
 ];
 if(!quick)SUITES.push(['400 kịch bản + hàm tính so với mẫu chuẩn','regression/so-sanh.js']);
 const logDir=path.join(__dirname,'..','test-output');fs.mkdirSync(logDir,{recursive:true});

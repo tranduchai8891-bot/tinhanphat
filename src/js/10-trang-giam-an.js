@@ -96,7 +96,7 @@ function pickK7(el){
 let k7AutoDone=false;      // chỉ tự điền 1 lần, sau đó tôn trọng lựa chọn của người dùng
 // Duyệt lần lượt các kỳ giảm đã nhập để suy ra đợt xét của TỪNG kỳ.
 // Kỳ 1: đợt sớm nhất đủ số quý Khá liên tục kể từ mốc 1/3 (hoặc 1/4).
-// Kỳ 2 trở đi: đợt tiếp theo cách kỳ trước ít nhất 01 năm và đã tích đủ quý
+// Kỳ 2 trở đi: sớm nhất là cùng đợt của năm sau (mỗi năm tối đa 01 lần) và đã tích đủ quý
 //              theo Khoản 7 (liên tục Khá, hoặc >= 4 quý trong đó >= 2 quý liền kề).
 // Trả về danh sách các đợt đã được giảm; phần tử cuối là kỳ giảm gần nhất.
 function detectK7Series(){
@@ -145,8 +145,8 @@ function detectReductionSeries(e,x,nPeriods){
   for(let i=startIdx;i<nPeriods;i++){
     const rv=(i===0)
       ? findNext(milestone,need1,null)
-      // cách kỳ trước ít nhất 01 năm; Khoản 7: cần đủ số quý kể từ lần giảm trước
-      : findNext(new Date(prev.date.getFullYear()+Q.khoan7.cachNam,prev.date.getMonth(),prev.date.getDate()),Q.khoan7.tongQuy,prev.date);
+      // sớm nhất cùng đợt năm sau (Điều 12 TTLT 02/2021); Khoản 7: cần đủ số quý kể từ lần giảm trước
+      : findNext(k7EarliestNext(prev.date),Q.khoan7.tongQuy,prev.date);
     if(!rv)break;
     out.push(rv);
     prev=rv;
