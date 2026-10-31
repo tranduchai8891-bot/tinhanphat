@@ -13,10 +13,10 @@ const SELFTEST_FINGERPRINTS={
   "Quý đủ điều kiện xếp loại (completedQuarters)":"f8efce41",
   "Đợt xét giảm án (findEligibleReview)":"23f17c8a",
   "Hiển thị năm/tháng/ngày (fmtDays, addYMD)":"69f1291e",
-  "Hồ sơ cập nhật theo ngày (liveProfileValues)":"cddcb8e0",
+  "Hồ sơ cập nhật theo ngày (liveProfileValues)":"2686c1da",
   "Tự xếp loại Điều 25, 26 (autoGrades)":"0a031ee9",
   "Kết luận xét giảm án (evaluateRemission)":"6da9f4dd",
-  "Trốn/tạm đình chỉ (computeSentence)":"28413467"
+  "Trốn/tạm đình chỉ (computeSentence)":"a3ed1e8b"
 };
 
 function selfTestCases(){
@@ -58,7 +58,19 @@ function selfTestCases(){
       '01/10/2020 | 01/01/2021 | 01/10/2021 | hết án 01/04/2023'],
     ['Trốn/tạm đình chỉ — ví dụ trên, tính đến 15/07/2021 (đang trốn): thời gian chấp hành dừng lại',
       ()=>{const r=escCase(D(1,1,2020),36,0,[{from:'01/06/2021',to:'01/09/2021'}],D(15,7,2021));return 'đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
-      'đã chấp hành 1 năm 5 tháng 0 ngày | còn lại 1 năm 7 tháng 0 ngày']
+      'đã chấp hành 1 năm 5 tháng 0 ngày | còn lại 1 năm 7 tháng 0 ngày'],
+    ['Án đã hết từ lâu — bắt 09/03/1984, án 6 năm, tính đến 30/10/2026: đã chấp hành dừng ở mức án',
+      ()=>{const r=computeSentence({name:'',arrestDate:D(9,3,1984),sentMonths:72,sD:0,preDetMonths:0,pdD:0,remMonths:0,remissionsSnapshot:[]},D(30,10,2026),'qlpn');
+        return 'hết án '+fmtDate(r.releaseDate)+' | đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
+      'hết án 09/03/1990 | đã chấp hành 6 năm 0 tháng 0 ngày | còn lại 0 năm 0 tháng 0 ngày'],
+    ['Án đã hết — bắt 09/03/1984, án 6 năm, tạm giam 2 tháng 15 ngày, giảm 1 năm, tính đến 30/10/2026',
+      ()=>{const r=computeSentence({name:'',arrestDate:D(9,3,1984),sentMonths:72,sD:0,preDetMonths:2,pdD:15,remMonths:12,remissionsSnapshot:[]},D(30,10,2026),'qlpn');
+        return 'hết án '+fmtDate(r.releaseDate)+' | đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
+      'hết án 24/12/1988 | đã chấp hành 5 năm 0 tháng 0 ngày | còn lại 0 năm 0 tháng 0 ngày'],
+    ['Án đã hết — bắt 09/03/1984, án 6 năm 6 tháng 20 ngày, trốn 13/11/1985-29/03/1986, tính đến 30/10/2026',
+      ()=>{const r=escCase(D(9,3,1984),78,20,[{from:'13/11/1985',to:'29/03/1986'}],D(30,10,2026));
+        return 'hết án '+fmtDate(r.releaseDate)+' | đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
+      'hết án 15/02/1991 | đã chấp hành 6 năm 6 tháng 20 ngày | còn lại 0 năm 0 tháng 0 ngày']
   ];
 }
 const ESC_EX=[{from:'13/11/1985',to:'29/03/1986'},{from:'02/04/1986',to:'11/09/2026'}];

@@ -6,6 +6,14 @@
 
 const CALC_MODE_NAME={qlpn:'Áp dụng theo phần mềm QLPN cũ', thuc:'Áp dụng theo phần mềm QLPN mới'};
 
+// Đã hết án (ngày tính sau ngày hết án): thời gian đã chấp hành dừng ở mức án, sau khi trừ phần
+// được giảm (tạm giam đã nằm trong đó; thời gian trốn/tạm đình chỉ không tính), không cộng tiếp những ngày
+// sau ngày hết án. Thời hạn còn lại khi đó = 0. Ví dụ: bắt 1984, án 6 năm, tính đến 2026 → 6 năm 0 tháng 0 ngày.
+function servedWhenReleased(sentMonths,sD,remMonths){
+  const m=sentMonths-remMonths;
+  return m<0?{years:0,months:0,days:0}:{years:Math.floor(m/12),months:m%12,days:sD};
+}
+
 // inp : {name, arrestDate, sentMonths, sD, preDetMonths, pdD, remMonths, remissionsSnapshot:[{months}],
 //        escapes:[{from,to,dur,n}] (không bắt buộc) — các lần trốn/tạm đình chỉ}
 // today: ngày tham chiếu; mode: 'qlpn' | 'thuc'
@@ -24,7 +32,8 @@ function computeSentence(inp,today,mode){
   // "Thời gian đã chấp hành": từ ngày bắt đến ngày tham chiếu (ngày bắt là ngày chấp hành thứ 1),
   // cộng thêm thời gian tạm giam (tạm giam được tính là đã chấp hành), quy ước 1 tháng = 30 ngày
   const servedFromArrest=today>=arrestDate?calcServedTime(arrestDate,today):{years:0,months:0,days:0};
-  const servedDiff=addYMD(servedFromArrest,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD});
+  const servedDiff=today>releaseDate?servedWhenReleased(sentMonths,sD,inp.remMonths)
+    :addYMD(servedFromArrest,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD});
   // Mốc 1/4, 1/3, 1/2 so với MỨC ÁN BAN ĐẦU (có trừ tạm giam, không trừ giảm án)
   const m25=calcMilestoneDate(arrestDate,sentMonths,sD,4,preDetMonths,pdD);
   const m33=calcMilestoneDate(arrestDate,sentMonths,sD,3,preDetMonths,pdD);
@@ -40,7 +49,8 @@ function computeSentence(inp,today,mode){
             pct:Math.min(100,Math.round(Math.max(0,elapsedMs-escMsBefore(esc,today))/Math.max(1,totalSentenceMs)*100)),
             left:Math.max(0,Math.ceil((rel-today)/86400000)),
             remainingDiff:remain,
-            servedDiff:addYMD(servedNet,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD}),
+            servedDiff:today>rel?servedWhenReleased(sentMonths,sD,inp.remMonths)
+              :addYMD(servedNet,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD}),
             m25:escShift(m25,inp.escapes),m33:escShift(m33,inp.escapes),m50:escShift(m50,inp.escapes),
             esc:inp.escapes,escTotal:sumYMD(esc.map(p=>p.dur))};
   }
