@@ -17,7 +17,8 @@ function readRemissionInputs(){
     arrival:getArrivalDate(),
     grades:quarterGrades,
     picked:pickedReduction,
-    k7:{on:on('rmK7'), value:btnVal('rmK7Btn'), label:(k7b&&k7b.textContent)||'', date:getRmK7Date()},
+    // Chưa chọn đợt (nút còn chữ "— Chọn kỳ giảm —") thì không lấy chữ trên nút làm tên đợt
+    k7:{on:on('rmK7'), value:btnVal('rmK7Btn'), label:(k7b&&k7b.dataset.value&&k7b.textContent)||'', date:getRmK7Date()},
     k8:{on:on('rmK8'), need:btnVal('rmK8Btn'), date:getK8Date(), dec:getK8DecDate()},
     k9:{on:on('rmK9'), type:btnVal('rmK9Btn'), life:on('rmK9Life')}
   };
@@ -198,11 +199,12 @@ function evaluateRemission(e,x){
       const pickedName=String(x.k7.label||'').replace(/\s*\(ngày xét.*\)$/,'')||guessReviewName(lastRed);
       const monthsSince=Math.max(0,Math.round((e.today-lastRed)/(1000*60*60*24*30.44)));
       sinceTxt=' kể từ kỳ giảm '+fmtDate(lastRed);
-      // Mỗi năm chỉ được xét giảm 01 lần; khoảng cách 2 lần xét ít nhất 01 năm
-      k7MinNext=new Date(lastRed.getFullYear()+Q.khoan7.cachNam,lastRed.getMonth(),lastRed.getDate());
+      // Mỗi năm chỉ được xét giảm 01 lần: sớm nhất là cùng đợt của năm sau (Điều 12 TTLT 02/2021)
+      k7MinNext=k7EarliestNext(lastRed);
+      const k7NextRound=reviewRoundOf(k7MinNext);
       hints.k7='Từ kỳ giảm này đến nay khoảng <b>'+formatYearMonth(monthsSince)
-        +'</b>, tối đa đạt <b>'+Math.floor(monthsSince/3)+' quý</b> xếp loại. Đợt xét tiếp theo phải từ <b>'
-        +fmtDate(k7MinNext)+'</b> trở đi.';
+        +'</b>, tối đa đạt <b>'+Math.floor(monthsSince/3)+' quý</b> xếp loại. Mỗi năm chỉ được xét giảm 01 lần nên đợt sớm nhất được xét tiếp là <b>'
+        +shortReviewLabel(k7NextRound.name,k7MinNext)+'</b> (ngày xét '+fmtDate(k7MinNext)+').';
       // Chỉ tính các quý xếp loại SAU kỳ giảm gần nhất
       const st=gradeStats(qList.filter(q=>q.end>lastRed),gradeFn);
       qSinceTotal=st.total; qSinceAdj=st.adj;
@@ -246,7 +248,7 @@ function evaluateRemission(e,x){
     let realReview=needQ>0?reviewWithQuarters(needQ,k7MinNext):null;
     if(!realReview){
       // Không tính được theo chuỗi quý: lấy đợt xét đầu tiên kể từ ngày tính (không sớm hơn mốc
-      // thời gian và bảo đảm cách lần giảm trước 01 năm)
+      // thời gian và không sớm hơn cùng đợt năm sau của lần giảm trước)
       let from=milestone;
       if(e.today>from)from=e.today;
       if(k7MinNext&&k7MinNext>from)from=k7MinNext;
@@ -263,7 +265,7 @@ function evaluateRemission(e,x){
     ? Math.max(needTotal-qSinceTotal,needAdj-qSinceAdj,1)
     : Math.max(1,Math.min(needAdj-qAdj, k5Avail?Math.max(k5Total-qTotal,k5Adj-qAdj):Infinity));
   let readyDate=addQuarters(e.today,miss);
-  if(k7MinNext&&readyDate<k7MinNext)readyDate=k7MinNext;   // bảo đảm cách lần giảm trước 01 năm
+  if(k7MinNext&&readyDate<k7MinNext)readyDate=k7MinNext;   // không sớm hơn cùng đợt năm sau của lần giảm trước
   const nextReview=findEligibleReview(readyDate);
   return done('pending','<span class="rc-head">◷ Đủ thời gian — chưa đủ xếp loại</span>'
     +'Đã đạt mốc '+fracTxt+' mức án nhưng '+detail+'còn thiếu <b>'+miss+' quý</b> xếp loại Khá. '

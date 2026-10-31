@@ -87,12 +87,7 @@ function parseStrictDateText(text){
 // Ngày xét thực tế người dùng nhập trong popup chọn kỳ giảm
 function getK7PickDate(){return readStrictDate('k7PickDate');}
 // Suy ra tên đợt từ tháng xét khi người dùng chỉ nhập ngày
-function guessReviewName(d){
-  const m=d.getMonth()+1;
-  if(m>=10||m<=1)return 'Tết Nguyên Đán';
-  if(m>=6&&m<=8)return 'Quốc khánh 2/9';
-  return '30/4 - 1/5';
-}
+function guessReviewName(d){return reviewRoundOf(d).name;}
 function confirmK7Pick(){
   const manual=getK7PickDate();
   if(manual){
@@ -113,7 +108,7 @@ function confirmK7Pick(){
 // 15/3/2025 -> "30/4-1/5/2025"
 function shortReviewLabel(name,date){
   const y=date.getFullYear();
-  if(name.indexOf('Tết')>=0)return 'Tết Nguyên Đán '+(y+1);   // xét tháng 12 cho Tết năm sau
+  if(name.indexOf('Tết')>=0)return 'Tết Nguyên Đán '+(date.getMonth()<2?y:y+1);   // xét tháng 12 cho Tết năm sau; ngày tháng 1-2 là Tết năm đó
   if(name.indexOf('2/9')>=0)return '2/9/'+y;
   if(name.indexOf('30/4')>=0)return '30/4-1/5/'+y;
   return name+' '+y;

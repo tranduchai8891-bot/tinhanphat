@@ -1,5 +1,30 @@
 # Nhật ký thay đổi
 
+## v95 — 31/10/2026
+
+**Hiển thị gọn**
+- "Thời gian đã chấp hành" và "Thời hạn còn lại" khi 0 năm 0 tháng thì ghi gọn "… ngày", ví dụ "17 ngày". 0 năm 0 tháng 0 ngày ghi là "0 ngày". Các trường hợp khác vẫn ghi đủ "… năm … tháng … ngày".
+- Áp dụng ở kết quả tính, nội dung sao chép, lịch sử, hồ sơ, tổng quan, phiếu in, file Excel.
+
+**Khoản 7: đợt xét giảm tiếp theo**
+- Theo Điều 12 Thông tư liên tịch 02/2021/TTLT-TANDTC-VKSNDTC-BCA-BQP, mỗi năm chỉ được xét giảm tối đa 01 lần. Đã được giảm ở đợt nào thì đợt sớm nhất được xét tiếp là cùng đợt của năm sau, không cần đủ tròn 12 tháng giữa 2 ngày xét.
+  - Ví dụ: giảm đợt 2/9/2025, ngày xét thực tế 20/07/2025 → được xét lại đợt 2/9/2026 (ngày xét 15/07/2026). Trước đây phần mềm tính từ 20/07/2026 nên nhảy sang Tết 2027.
+- Ngày nhập vào (ngày xét thực tế, ngày quyết định) được quy về đợt:
+  - tháng 3–5: đợt 30/4;
+  - tháng 6–10: đợt 2/9;
+  - tháng 11–2: đợt Tết.
+
+  Đã sửa cách đặt tên đợt cũ: ngày tháng 9 từng bị gọi là đợt 30/4; ngày tháng 1–2 thuộc Tết từng bị ghi sai năm.
+- Khi chọn đợt từ danh sách (ngày xét cố định 15/3, 15/7, 15/12), kết luận không đổi. Đã so trên 4.000 trường hợp.
+- Sửa lỗi: chỉ nhập ngày xét thực tế mà chưa chọn đợt thì kết luận ghi "— Chọn kỳ giảm — 2025". Nay ghi đúng tên đợt.
+
+**Căn cứ**
+- Ghi đầy đủ "Nghị quyết 03/2024/NQ-HĐTP" ở mọi chỗ trước đây ghi "Nghị quyết 03" hoặc "Nghị quyết 03/2024".
+
+**Kiểm thử**
+- Tự kiểm tra `#kiemthu`: thêm 4 ví dụ (nay 66 mục). Cập nhật 2 dấu vân tay: hồ sơ (định dạng gọn) và kết luận xét giảm (câu gợi ý Khoản 7).
+- Thêm nhóm kiểm thử "Định dạng gọn, Khoản 7 cùng đợt năm sau".
+
 ## v94 — 31/10/2026
 
 **Nhập ngày**
