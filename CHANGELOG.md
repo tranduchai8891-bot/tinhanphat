@@ -4,7 +4,7 @@
 
 **Nhập ngày**
 - Năm gõ tắt 2 số ở các ô ngày đã qua (ngày bắt, ngày đến trại, ngày trốn/tạm đình chỉ, kỳ giảm đã xét, ngày quyết định kỷ luật): lớn hơn năm hiện tại thì hiểu là 19xx. Ví dụ 84 → 1984 (trước đây thành 2084); 18 → 2018. Ô Ngày giả định vẫn hiểu là 20xx.
-- Khi phần mềm tự sửa ngày không có thật (31/04 → 30/04, 29/02/2023 → 28/02/2023, tháng 13 → 12), hiện dòng chữ cam ngay dưới ô để người nhập kiểm tra lại.
+- Khi phần mềm tự sửa ngày không có thật (31/04 → 30/04, 29/02/2023 → 28/02/2023, tháng 13 → 12), hiện dòng chữ cam ngay dưới ô để người nhập kiểm tra lại. Ô ngày bắt không hiện dòng này.
 - Bấm Tính:
   - báo lỗi và không tính khi ngày bắt sau ngày hôm nay hoặc sau ngày giả định;
   - báo lỗi khi ngày bắt hoặc ngày giả định không có thật.

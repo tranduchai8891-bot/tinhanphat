@@ -501,8 +501,10 @@ function expandShortYear(yy,past){
 
 // Báo nhẹ (chữ cam) ngay dưới ô khi phần mềm tự sửa ngày/tháng không có thật, để người nhập kiểm tra lại.
 // Dòng báo giữ nguyên khi gõ tiếp phần năm; tự mất khi sửa lại phần ngày/tháng hoặc xóa ô.
+// Ô ngày bắt không hiện dòng báo này (theo yêu cầu); khi bấm Tính vẫn kiểm tra ngày có thật hay không.
+const NO_ADJUST_NOTE=new Set(['arrestDateText']);
 function dateAdjustNote(el,msg){
-  if(!el)return;
+  if(!el||NO_ADJUST_NOTE.has(el.id))return;
   const host=el.closest('.input-clearable')||el;
   let n=host.nextElementSibling;
   if(!(n&&n.classList.contains('date-adjust')))n=null;
