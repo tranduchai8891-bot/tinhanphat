@@ -8,6 +8,7 @@
 - Bỏ chế độ "Chữ lớn". Máy đã từng bật chữ lớn nay hiển thị cỡ thường.
 - Hướng dẫn: bỏ mục "Chữ lớn"; ghi rõ nút "Chia sẻ dữ liệu" ở cuối trang.
 - Kiểm thử: nhóm "Báo lỗi tại ô nhập, chữ lớn" đổi thành "Báo lỗi tại ô nhập, chân trang" (15 mục).
+- GitHub Actions: cố định máy chạy kiểm thử ở Ubuntu 24.04. Nhãn `ubuntu-latest` đang chuyển sang Ubuntu 26, nơi bước cài Chromium bị lỗi.
 
 ## v95 — 31/10/2026
 

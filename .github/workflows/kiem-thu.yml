@@ -11,7 +11,9 @@ permissions:
 
 jobs:
   kiem-thu:
-    runs-on: ubuntu-latest
+    # Cố định Ubuntu 24.04: từ 19/10/2026 nhãn ubuntu-latest chuyển dần sang Ubuntu 26,
+    # bản Playwright đang dùng chưa cài được Chromium trên đó. Kết quả kiểm thử không phụ thuộc đợt nâng cấp của GitHub.
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
       TZ: Asia/Ho_Chi_Minh
