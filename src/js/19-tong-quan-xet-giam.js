@@ -295,21 +295,6 @@ function backupReminderHTML(){
     +'<button type="button" onclick="exportProfilesFile()">Sao lưu</button></div>';
 }
 
-// ===== CHẾ ĐỘ CHỮ LỚN =====
-const BIG_TEXT_KEY='prison_big_text';
-function applyBigText(on){
-  document.documentElement.classList.toggle('big',!!on);
-  const b=document.getElementById('bigTextBtn'); if(b)b.textContent='Chữ lớn: '+(on?'Bật':'Tắt');
-}
-function toggleBigText(){
-  const on=!document.documentElement.classList.contains('big');
-  try{localStorage.setItem(BIG_TEXT_KEY,on?'1':'0');}catch(e){}
-  applyBigText(on);
-}
-(function(){let on=false;try{on=localStorage.getItem(BIG_TEXT_KEY)==='1';}catch(e){}
-  if(on)applyBigText(true);
-  document.addEventListener('DOMContentLoaded',()=>applyBigText(document.documentElement.classList.contains('big')));})();
-
 // ===== THANH ĐIỀU HƯỚNG DƯỚI ĐÁY =====
 const TEAM_PAGES={team:'teamOverlay',review:'reviewOverlay',grades:'gradeOverlay'};
 function closeTeamPages(except){
