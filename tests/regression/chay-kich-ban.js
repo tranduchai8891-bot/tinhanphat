@@ -34,6 +34,8 @@ const [,,file,outFile,NS='120',PURE='1']=process.argv;
   const names=['','Nguyễn Văn An','Trần Thị Bình','Lê Văn Cường','Phạm Minh Đức','Hoàng Văn Em','Võ Thị Phương','<b>Đặng</b> "Giang" & Co'];
   const scen=[];
   for(let s=0;s<+NS;s++){
+    // Mỗi kịch bản có hạt giống ngẫu nhiên riêng: kịch bản trước dừng sớm (ví dụ bị báo lỗi) không làm đổi dữ liệu các kịch bản sau
+    seed=(987654321^Math.imul(s+1,-1640531535))|0; if(!seed)seed=1; for(let k=0;k<4;k++)rnd();
     const rec={s};
     const ay=2016+ri(11), am=1+ri(12), last=new Date(ay,am,0).getDate();
     const ad=ri(3)===0?last:(ri(4)===0?Math.min(last,29+ri(3)):1+ri(last));
@@ -80,6 +82,8 @@ const [,,file,outFile,NS='120',PURE='1']=process.argv;
     const shown=await ev(()=>document.getElementById('modalOverlay').classList.contains('show'));
     rec.shown=shown;
     rec.warn=await ev(()=>document.getElementById('quarterWarn').style.display==='flex'?__txt('#qwText'):null);
+    const fe=await ev(()=>[...document.querySelectorAll('.field-err')].map(e=>e.textContent).join(' | '));
+    if(fe)rec.fieldErr=fe;
     if(!shown){scen.push(rec);continue;}
     const capRes=()=>ev(()=>({modal:__txt('#modalOverlay'),copy:lastResultText,pct:lastProgressPct,alert:__vis('alertBanner'),mode:CALC_MODE,note:__txt('#calcModeNote'),cls:document.getElementById('r-class').className}));
     rec.res1=await capRes();

@@ -122,6 +122,7 @@ function rowToProfile(get,today){
   if(!name)return {err:'thiếu họ tên'};
   const arrestText=xlDate(get('arrest')), arrest=strictDMY(arrestText);
   if(!arrest)return {err:'ngày bắt không hợp lệ ('+(String(get('arrest')||'').trim()||'trống')+')'};
+  if(today&&arrest>today)return {err:'ngày bắt '+arrestText+' sau ngày hôm nay'};
   let sent;
   if([get('sY'),get('sM'),get('sD')].some(v=>String(v||'').trim()!=='')){
     const y=xlInt(get('sY')),m=xlInt(get('sM')),d=xlInt(get('sD'));

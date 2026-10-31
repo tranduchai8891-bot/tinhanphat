@@ -643,6 +643,7 @@ body.typing .bottom-nav{transform:translateY(120%)}
 .pr-note{font-style:italic;font-size:11pt}
 .date-single-input.invalid,.row3 input.invalid{border-color:#c62828!important;background:#fff5f5}
 .field-err{font-size:11.5px;font-weight:600;color:#c62828;margin-top:5px;line-height:1.4}
+.date-adjust{font-size:11.5px;font-weight:600;color:#9a5800;margin-top:5px;line-height:1.4}
 html.big .app,html.big .modal-box,html.big .qpick-box,html.big .qw-box,html.big .choice-box,html.big .bottom-nav{zoom:1.12}
 html.big .modal-box{max-height:calc(100% / 1.12)}
 html.big .esc-grid{grid-template-columns:1fr}
@@ -709,6 +710,11 @@ html.big #teamOverlay,html.big #reviewOverlay,html.big #gradeOverlay{padding-bot
 .sec-opt{text-align:center;padding:12px 13px}
 .sec-opt .exp-opt-t{margin-bottom:0}
 .sec-msg{min-height:16px;font-size:11.5px;font-weight:700;color:#b91c1c;text-align:center;margin-top:6px}
+.sec-msg.ok{color:#1d6f42}
+.pw-tools{display:flex;gap:8px;margin-top:8px}
+.pw-tool{flex:1;height:36px;border:1.5px solid #c9ced8;border-radius:9px;background:#fff;color:#7f1d1d;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.pw-tool:active{background:#f6f1f1}
+.pin-input.pw[type=text]{letter-spacing:1.5px}
 #pinMsg{white-space:pre-line;line-height:1.5}
 #pinOk:disabled{opacity:.45;cursor:not-allowed}
 .pin-input:disabled{background:#f1f2f4;border-color:#d7dbe1}
@@ -1173,8 +1179,18 @@ html.big #teamOverlay,html.big #reviewOverlay,html.big #gradeOverlay{padding-bot
     <div class="qpick-box">
       <div class="qpick-title" id="pwTitle">Mật khẩu file</div>
       <p class="sec-note" id="pwNote"></p>
-      <input type="password" id="pwA" class="pin-input pw" autocomplete="new-password" maxlength="64" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')confirmPassword()">
-      <input type="password" id="pwB" class="pin-input pw" autocomplete="new-password" maxlength="64" placeholder="Nhập lại mật khẩu" onkeydown="if(event.key==='Enter')confirmPassword()">
+      <div class="pin-wrap">
+        <input type="password" id="pwA" class="pin-input pw" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="64" placeholder="Mật khẩu" oninput="pwEdited()" onkeydown="if(event.key==='Enter')confirmPassword()">
+        <button type="button" class="pin-eye" onmousedown="event.preventDefault()" onclick="togglePinEye('pwA',this)" title="Hiện mật khẩu" aria-label="Hiện mật khẩu"><svg class="ic-eye" aria-hidden="true"><use href="#ic-eye"/></svg></button>
+      </div>
+      <div class="pw-tools" id="pwTools">
+        <button type="button" class="pw-tool" id="pwCopy" onclick="copyPassword()">Sao chép</button>
+        <button type="button" class="pw-tool" onclick="newPassword()">Tạo mật khẩu khác</button>
+      </div>
+      <div class="pin-wrap" id="pwBWrap">
+        <input type="password" id="pwB" class="pin-input pw" autocomplete="new-password" autocapitalize="off" spellcheck="false" maxlength="64" placeholder="Nhập lại mật khẩu" onkeydown="if(event.key==='Enter')confirmPassword()">
+        <button type="button" class="pin-eye" onmousedown="event.preventDefault()" onclick="togglePinEye('pwB',this)" title="Hiện mật khẩu" aria-label="Hiện mật khẩu"><svg class="ic-eye" aria-hidden="true"><use href="#ic-eye"/></svg></button>
+      </div>
       <div class="sec-msg" id="pwMsg"></div>
       <div style="display:flex;gap:8px;margin-top:10px">
         <button class="modal-btn ghost" style="flex:1" onclick="closePassword()">Hủy</button>
@@ -1395,7 +1411,7 @@ html.big #teamOverlay,html.big #reviewOverlay,html.big #gradeOverlay{padding-bot
         <div class="annex-section">
           <div class="annex-title">3. Hướng dẫn sử dụng</div>
           <p class="annex-desc" style="font-weight:600;color:#7f1d1d;margin-top:4px">3.1. Nhập thông tin bản án</p>
-          <div class="guide-step"><span class="guide-dot"></span><span><b>Ngày bắt / bắt đầu chấp hành án:</b> nhập theo định dạng ngày/tháng/năm. Phần mềm tự chèn dấu gạch chéo và sửa ngày, tháng không hợp lệ (ví dụ 31/4 → 30/4).</span></div>
+          <div class="guide-step"><span class="guide-dot"></span><span><b>Ngày bắt / bắt đầu chấp hành án:</b> nhập theo định dạng ngày/tháng/năm. Phần mềm tự chèn dấu gạch chéo và sửa ngày, tháng không có thật (ví dụ 31/4 → 30/4). Năm có thể gõ tắt 2 số: <b>18 → 2018</b>; năm gõ tắt lớn hơn năm hiện tại được hiểu là năm 19xx (<b>84 → 1984</b>). Riêng ô Ngày giả định luôn hiểu là 20xx. Ngày bắt sau ngày tính sẽ bị báo lỗi.</span></div>
           <div class="guide-step"><span class="guide-dot"></span><span><b>Mức án:</b> nhập số năm, tháng, ngày của bản án vào ba ô tương ứng. Mức án tối đa là <b>30 năm</b> — khi nhập 30 năm, ô tháng và ngày sẽ tự về 0.</span></div>
           <div class="guide-step"><span class="guide-dot"></span><span><b>Thời gian tạm giam trước đó:</b> nếu có, nhập số năm, tháng, ngày đã bị tạm giữ, tạm giam (sẽ được trừ vào thời gian phải chấp hành). Thời gian này không được vượt quá mức án: khi số năm bằng nhau, số tháng và ngày cũng không lớn hơn của mức án.</span></div>
           <p class="annex-desc" style="font-weight:600;color:#7f1d1d;margin-top:8px">3.2. Nhập các kỳ giảm án (nếu có)</p>
@@ -2230,7 +2246,7 @@ function formMilestoneInfo(){
   const d=parseInt(p[0]),m=parseInt(p[1]);
   let y=parseInt((p[2]||'').replace(/\D/g,''));
   if(!d||!m||!y)return null;
-  if(String(p[2]).replace(/\D/g,'').length<=2)y=2000+y;
+  if(String(p[2]).replace(/\D/g,'').length<=2)y=expandShortYear(y,true);
   const arrest=new Date(y,m-1,d);
   const iv=id=>parseInt((document.getElementById(id).value||'').replace(/[^\d]/g,''))||0;
   const sentMonths=iv('sY')*12+iv('sM'), sD=iv('sD');
@@ -2509,6 +2525,7 @@ function updateAlert(daysLeft){
 function clearInput(id){
   const el=document.getElementById(id);
   el.value='';
+  dateAdjustNote(el,'');
   toggleClearBtn(el);
   el.focus();
 }
@@ -2632,10 +2649,11 @@ function formatDateInput(el){
   }
 
   // --- KẸP THÁNG > 12 về 12 (khi đã đủ 2 chữ số tháng) ---
+  let adjMsg='';   // câu báo khi phần mềm phải tự sửa ngày/tháng không có thật
   if(monthPart.length===2){
     const mm=parseInt(monthPart);
-    if(mm>12)monthPart='12';
-    if(mm===0)monthPart='01';
+    if(mm>12){monthPart='12';adjMsg='Không có tháng '+mm+' — đã sửa thành tháng 12. Kiểm tra lại.';}
+    if(mm===0){monthPart='01';adjMsg='Không có tháng 00 — đã sửa thành tháng 01. Kiểm tra lại.';}
   }
 
   // --- KẸP NGÀY không hợp lệ về ngày cuối tháng ---
@@ -2653,7 +2671,11 @@ function formatDateInput(el){
       }else{
         maxDay=new Date(2024,mm,0).getDate();
       }
-      if(dd>maxDay){dd=maxDay;dayPart=String(dd).padStart(2,'0');}
+      if(dd>maxDay){
+        adjMsg=(mm===2&&yearPart.length!==4?'Tháng 2 có nhiều nhất 29 ngày':'Tháng '+mm+(yearPart.length===4?'/'+yearPart:'')+' chỉ có '+maxDay+' ngày')
+          +' — đã sửa ngày '+dd+' thành '+maxDay+'. Kiểm tra lại.';
+        dd=maxDay;dayPart=String(dd).padStart(2,'0');
+      }
     }
   }
 
@@ -2673,6 +2695,7 @@ function formatDateInput(el){
   }
 
   el.value=formatted;
+  dateAdjustNote(el,adjMsg);
 
   // --- Khôi phục vị trí con trỏ ---
   let newPos;
@@ -2702,8 +2725,33 @@ function formatDateInput(el){
   try{el.setSelectionRange(newPos,newPos);}catch(e){}
 }
 
-// Khi rời ô (blur): nếu phần năm chỉ có 1-2 chữ số thì hiểu là nhập tắt -> mở rộng thành 20xx.
-// Ví dụ: 01 -> 2001, 18 -> 2018, 5 -> 2005. (Chỉ áp dụng năm 2000-2999.)
+// Năm gõ tắt 1-2 chữ số -> năm đủ 4 chữ số. Mặc định hiểu là 20xx (18 -> 2018, 5 -> 2005).
+// Với các ô chỉ có thể là ngày đã qua (ngày bắt, ngày đến trại, ngày trốn/tạm đình chỉ, kỳ giảm đã xét,
+// ngày quyết định kỷ luật): nếu 20xx lớn hơn năm hiện tại thì hiểu là 19xx (năm 2026: 84 -> 1984, 26 -> 2026).
+// Ô "ngày giả định" và các ô có thể là ngày tương lai luôn hiểu là 20xx.
+const PAST_DATE_FIELD=/^(arrestDateText|rmArrival|rmK7Date|rmK8DecDate|k7PickDate|esc[FT]\d+)$/;
+function expandShortYear(yy,past){
+  const n=parseInt(String(yy),10)||0, y=2000+n;
+  return past&&y>new Date().getFullYear()?1900+n:y;
+}
+
+// Báo nhẹ (chữ cam) ngay dưới ô khi phần mềm tự sửa ngày/tháng không có thật, để người nhập kiểm tra lại.
+// Dòng báo giữ nguyên khi gõ tiếp phần năm; tự mất khi sửa lại phần ngày/tháng hoặc xóa ô.
+// Ô ngày bắt không hiện dòng báo này (theo yêu cầu); khi bấm Tính vẫn kiểm tra ngày có thật hay không.
+const NO_ADJUST_NOTE=new Set(['arrestDateText']);
+function dateAdjustNote(el,msg){
+  if(!el||NO_ADJUST_NOTE.has(el.id))return;
+  const host=el.closest('.input-clearable')||el;
+  let n=host.nextElementSibling;
+  if(!(n&&n.classList.contains('date-adjust')))n=null;
+  const dm=el.value.slice(0,5);
+  if(msg){
+    if(!n){n=document.createElement('div');n.className='date-adjust';n.setAttribute('role','status');host.after(n);}
+    n.textContent=msg; el.dataset.adjDm=dm;
+  }else if(n&&(el.dataset.adjDm!==dm||!el.value)){n.remove();delete el.dataset.adjDm;}
+}
+
+// Khi rời ô (blur): nếu phần năm chỉ có 1-2 chữ số thì hiểu là nhập tắt -> mở rộng thành năm đủ (xem expandShortYear).
 // Năm đã đủ 4 chữ số thì giữ nguyên (cách nhập bình thường).
 function expandYearOnBlur(el){
   const v=el.value.trim();
@@ -2715,9 +2763,7 @@ function expandYearOnBlur(el){
   let yearPart=(segs[2]||'').replace(/\D/g,'');
 
   if(yearPart.length>=1 && yearPart.length<=2){
-    // 1 chữ số: pad 0 thành 2 chữ số (vd '5' -> '05'), rồi thêm '20' phía trước
-    const yy=yearPart.padStart(2,'0');
-    yearPart='20'+yy;
+    yearPart=String(expandShortYear(yearPart,PAST_DATE_FIELD.test(el.id||'')));
     el.value=dayPart+'/'+monthPart+'/'+yearPart;
     // Sau khi mở rộng năm, nếu là tháng 2 cần kiểm tra lại ngày nhuận
     if(monthPart.length===2 && dayPart.length===2){
@@ -2725,7 +2771,10 @@ function expandYearOnBlur(el){
       let dd=parseInt(dayPart);
       if(mm>=1 && mm<=12 && yyyy>=1900){
         const maxDay=new Date(yyyy,mm,0).getDate();
-        if(dd>maxDay){dd=maxDay;el.value=String(dd).padStart(2,'0')+'/'+monthPart+'/'+yearPart;}
+        if(dd>maxDay){
+          el.value=String(maxDay).padStart(2,'0')+'/'+monthPart+'/'+yearPart;
+          dateAdjustNote(el,'Tháng '+mm+'/'+yyyy+' chỉ có '+maxDay+' ngày — đã sửa ngày '+dd+' thành '+maxDay+'. Kiểm tra lại.');
+        }
       }
     }
   }
@@ -2804,6 +2853,14 @@ function chooseRealDay(always){
 
 const CALC_MODE_NAME={qlpn:'Áp dụng theo phần mềm QLPN cũ', thuc:'Áp dụng theo phần mềm QLPN mới'};
 
+// Đã hết án (ngày tính sau ngày hết án): thời gian đã chấp hành dừng ở mức án, sau khi trừ phần
+// được giảm (tạm giam đã nằm trong đó; thời gian trốn/tạm đình chỉ không tính), không cộng tiếp những ngày
+// sau ngày hết án. Thời hạn còn lại khi đó = 0. Ví dụ: bắt 1984, án 6 năm, tính đến 2026 → 6 năm 0 tháng 0 ngày.
+function servedWhenReleased(sentMonths,sD,remMonths){
+  const m=sentMonths-remMonths;
+  return m<0?{years:0,months:0,days:0}:{years:Math.floor(m/12),months:m%12,days:sD};
+}
+
 // inp : {name, arrestDate, sentMonths, sD, preDetMonths, pdD, remMonths, remissionsSnapshot:[{months}],
 //        escapes:[{from,to,dur,n}] (không bắt buộc) — các lần trốn/tạm đình chỉ}
 // today: ngày tham chiếu; mode: 'qlpn' | 'thuc'
@@ -2822,7 +2879,8 @@ function computeSentence(inp,today,mode){
   // "Thời gian đã chấp hành": từ ngày bắt đến ngày tham chiếu (ngày bắt là ngày chấp hành thứ 1),
   // cộng thêm thời gian tạm giam (tạm giam được tính là đã chấp hành), quy ước 1 tháng = 30 ngày
   const servedFromArrest=today>=arrestDate?calcServedTime(arrestDate,today):{years:0,months:0,days:0};
-  const servedDiff=addYMD(servedFromArrest,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD});
+  const servedDiff=today>releaseDate?servedWhenReleased(sentMonths,sD,inp.remMonths)
+    :addYMD(servedFromArrest,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD});
   // Mốc 1/4, 1/3, 1/2 so với MỨC ÁN BAN ĐẦU (có trừ tạm giam, không trừ giảm án)
   const m25=calcMilestoneDate(arrestDate,sentMonths,sD,4,preDetMonths,pdD);
   const m33=calcMilestoneDate(arrestDate,sentMonths,sD,3,preDetMonths,pdD);
@@ -2838,7 +2896,8 @@ function computeSentence(inp,today,mode){
             pct:Math.min(100,Math.round(Math.max(0,elapsedMs-escMsBefore(esc,today))/Math.max(1,totalSentenceMs)*100)),
             left:Math.max(0,Math.ceil((rel-today)/86400000)),
             remainingDiff:remain,
-            servedDiff:addYMD(servedNet,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD}),
+            servedDiff:today>rel?servedWhenReleased(sentMonths,sD,inp.remMonths)
+              :addYMD(servedNet,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD}),
             m25:escShift(m25,inp.escapes),m33:escShift(m33,inp.escapes),m50:escShift(m50,inp.escapes),
             esc:inp.escapes,escTotal:sumYMD(esc.map(p=>p.dur))};
   }
@@ -2943,18 +3002,19 @@ function recomputeByMode(){
   renderResult(computeSentence(lastCalcRaw.inp,lastCalcRaw.today,CALC_MODE),{keepProgress:true});
 }
 
-// Đọc "ngày/tháng/năm" người dùng nhập; năm 1-2 chữ số hiểu là 20xx. Thiếu phần nào thì phần đó = 0.
-function readDateParts(v){
+// Đọc "ngày/tháng/năm" người dùng nhập; năm 1-2 chữ số hiểu theo expandShortYear
+// (past=true: ô chỉ có thể là ngày đã qua, ví dụ ngày bắt). Thiếu phần nào thì phần đó = 0.
+function readDateParts(v,past){
   const p=String(v||'').split('/');
   let yRaw=(p[2]||'').replace(/\D/g,'');
-  if(yRaw.length>=1&&yRaw.length<=2)yRaw='20'+yRaw.padStart(2,'0');
+  if(yRaw.length>=1&&yRaw.length<=2)yRaw=String(expandShortYear(yRaw,past));
   return {d:parseInt(p[0])||0, m:parseInt(p[1])||0, y:parseInt(yRaw)||0};
 }
 
 function calculate(){
   CALC_MODE=CALC_MODE_DEFAULT;   // mở kết quả ở chế độ mặc định đang đặt
   const prisonerName=(document.getElementById('prisonerName').value||'').trim();
-  const a=readDateParts(document.getElementById('arrestDateText').value.trim());
+  const a=readDateParts(document.getElementById('arrestDateText').value.trim(),true);
   const num=id=>parseInt(document.getElementById(id).value)||0;
   const sY=num('sY'), sM=num('sM'), sD=num('sD');
   const pdY=num('pdY'), pdM=num('pdM'), pdD=num('pdD');
@@ -2964,12 +3024,23 @@ function calculate(){
   if(a.m<1||a.m>12){fieldError(['arrestDateText'],'Tháng phải từ 1 đến 12.');return}
   if(a.d<1||a.d>31){fieldError(['arrestDateText'],'Ngày phải từ 1 đến 31.');return}
   if(a.y<1900||a.y>2100){fieldError(['arrestDateText'],'Năm không hợp lệ.');return}
+  const p2=n=>String(n).padStart(2,'0'), dim=(m,y)=>new Date(y,m,0).getDate();
+  if(a.d>dim(a.m,a.y)){fieldError(['arrestDateText'],'Ngày '+p2(a.d)+'/'+p2(a.m)+'/'+a.y+' không có thật — tháng '+a.m+'/'+a.y+' chỉ có '+dim(a.m,a.y)+' ngày.');return}
   if(!sY&&!sM&&!sD){fieldError(['sY','sM','sD'],'Nhập mức án (năm, tháng hoặc ngày).');return}
   if(refMode==='custom'){
     const rv=document.getElementById('refDate').value.trim();
     const rp=rv.split('/');
     if(!rv||rp.length<3||!parseInt(rp[2])){fieldError(['refDate'],'Nhập ngày giả định, ví dụ 17/06/2026.');return}
+    const r=readDateParts(rv);
+    if(r.m<1||r.m>12||r.d<1||r.y<1900||r.y>2100||r.d>dim(r.m,r.y)){fieldError(['refDate'],'Ngày giả định '+rv+' không có thật.');return}
   }
+  // Ngày bắt phải từ ngày tính trở về trước (thường do gõ nhầm năm, ví dụ 2084 thay cho 1984)
+  const arrD=new Date(a.y,a.m-1,a.d), refD=getRefDate();
+  if(arrD>refD){
+    const custom=refMode==='custom';
+    fieldError(custom?['arrestDateText','refDate']:['arrestDateText'],
+      'Ngày bắt '+fmtDate(arrD)+' sau '+(custom?'ngày giả định ':'ngày hôm nay ')+fmtDate(refD)+'. Kiểm tra lại năm.');
+    return}
 
   // Đã nhập kỳ giảm đầu tiên mà chưa được hỏi -> hiện popup chọn kỳ giảm trước
   if(!k7PickShown && !pickedReduction && remissions[0] && ((remissions[0].years||0)||(remissions[0].months||0))){
@@ -4888,7 +4959,8 @@ function openPin(mode,after){
   setTimeout(()=>{if(!a.disabled)a.focus();},120);
 }
 function setPinEye(el,show){
-  const btn=el.parentNode.querySelector('.pin-eye'), t=show?'Ẩn mã PIN':'Hiện mã PIN';
+  const what=el.classList.contains('pw')?'mật khẩu':'mã PIN';
+  const btn=el.parentNode.querySelector('.pin-eye'), t=(show?'Ẩn ':'Hiện ')+what;
   el.type=show?'text':'password';
   btn.classList.toggle('on',show);
   btn.querySelector('use').setAttribute('href',show?'#ic-eye-off':'#ic-eye');
@@ -5018,33 +5090,84 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 // ----- File sao lưu .json có mật khẩu -----
-let pwMode=null, pwAfter=null;
+// Khi xuất, phần mềm tạo sẵn mật khẩu mạnh: 12 ký tự chữ thường và số (bỏ các ký tự dễ nhầm 0/o, 1/l/i),
+// chia 3 nhóm cho dễ đọc, khoảng 59 bit ngẫu nhiên. Người dùng vẫn có thể tự đặt mật khẩu riêng từ PW_MIN ký tự.
+// Khi nhập file thì không giới hạn độ dài, để file cũ (mật khẩu 6 ký tự) vẫn mở được.
+const PW_CHARS='abcdefghjkmnpqrstuvwxyz23456789', PW_MIN=10;
+let pwMode=null, pwAfter=null, pwGen='', pwCopied=false;
+function genPassword(){
+  const out=[], buf=new Uint8Array(16);
+  while(out.length<12){
+    crypto.getRandomValues(buf);
+    for(const x of buf)if(x<248&&out.length<12)out.push(PW_CHARS[x%31]);   // 248 = 8×31: bỏ phần dư để mọi ký tự đều nhau
+  }
+  return out.slice(0,4).join('')+'-'+out.slice(4,8).join('')+'-'+out.slice(8).join('');
+}
+function pwSay(t,good){const m=document.getElementById('pwMsg');m.textContent=t||'';m.classList.toggle('ok',!!good);}
+function newPassword(){
+  pwGen=genPassword(); pwCopied=false;
+  const a=document.getElementById('pwA');
+  a.value=pwGen; setPinEye(a,true);
+  document.getElementById('pwB').value='';
+  pwEdited();
+}
+// Tự đặt mật khẩu riêng (khác mật khẩu tạo sẵn) thì phải nhập lại lần 2 để chắc chắn không gõ nhầm
+function pwEdited(){
+  if(pwMode!=='export')return;
+  const own=document.getElementById('pwA').value!==pwGen;
+  document.getElementById('pwBWrap').style.display=own?'':'none';
+  document.getElementById('pwCopy').style.display=own?'none':'';
+  pwSay('');
+}
+function copyText(text){
+  return new Promise(res=>{
+    const fb=()=>{try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');document.body.removeChild(ta);res(!!ok);}catch(e){res(false);}};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>res(true),fb);else fb();
+  });
+}
+async function copyPassword(){
+  const v=document.getElementById('pwA').value;
+  if(!v)return;
+  pwCopied=await copyText(v);
+  pwSay(pwCopied?'Đã sao chép mật khẩu. Hãy lưu lại ở nơi an toàn.':'Không sao chép tự động được — hãy ghi lại mật khẩu trên.',pwCopied);
+}
 function openPassword(mode,after){
-  pwMode=mode; pwAfter=after;
-  document.getElementById('pwTitle').textContent=mode==='export'?'Đặt mật khẩu cho file':'Mật khẩu của file';
-  document.getElementById('pwNote').textContent=mode==='export'
-    ?'File dữ liệu luôn được mã hóa. Người nhận phải có mật khẩu này mới nhập được (ít nhất 6 ký tự). Gửi mật khẩu qua kênh khác với file.'
+  pwMode=mode; pwAfter=after; pwGen=''; pwCopied=false;
+  const exp=mode==='export';
+  document.getElementById('pwTitle').textContent=exp?'Mật khẩu cho file':'Mật khẩu của file';
+  document.getElementById('pwNote').textContent=exp
+    ?'File dữ liệu luôn được mã hóa. Phần mềm đã tạo sẵn mật khẩu mạnh — bấm "Sao chép", lưu lại và gửi cho người nhận qua kênh khác với file. Có thể tự đặt mật khẩu riêng từ '+PW_MIN+' ký tự.'
     :'File này đã được mã hóa. Nhập mật khẩu do người gửi cung cấp.';
   const a=document.getElementById('pwA'), b=document.getElementById('pwB');
-  a.value=''; b.value=''; b.style.display=mode==='export'?'':'none';
-  document.getElementById('pwMsg').textContent='';
+  a.value=''; b.value=''; setPinEye(a,false); setPinEye(b,false);
+  document.getElementById('pwTools').style.display=exp?'':'none';
+  document.getElementById('pwBWrap').style.display='none';
+  pwSay('');
+  if(exp)newPassword();
   document.getElementById('pwOverlay').style.display='flex';
-  setTimeout(()=>a.focus(),120);
+  if(!exp)setTimeout(()=>a.focus(),120);
 }
-function closePassword(){document.getElementById('pwOverlay').style.display='none';pwMode=null;pwAfter=null;}
+function closePassword(){
+  document.getElementById('pwOverlay').style.display='none';pwMode=null;pwAfter=null;pwGen='';pwCopied=false;
+  ['pwA','pwB'].forEach(id=>{const el=document.getElementById(id);el.value='';setPinEye(el,false);});
+}
 async function confirmPassword(){
   const a=document.getElementById('pwA').value, b=document.getElementById('pwB').value;
-  const msg=document.getElementById('pwMsg'), btn=document.getElementById('pwOk');
+  const btn=document.getElementById('pwOk');
+  const gen=pwMode==='export'&&!!pwGen&&a===pwGen;
   if(pwMode==='export'){
-    if(a.length<6){msg.textContent='Mật khẩu cần ít nhất 6 ký tự.';return;}
-    if(a!==b){msg.textContent='Hai lần nhập mật khẩu chưa khớp.';return;}
-  }else if(!a){msg.textContent='Vui lòng nhập mật khẩu.';return;}
-  btn.disabled=true; msg.textContent='Đang xử lý…';
+    if(!gen){
+      if(a.length<PW_MIN){pwSay('Mật khẩu tự đặt cần ít nhất '+PW_MIN+' ký tự.');return;}
+      if(a!==b){pwSay('Hai lần nhập mật khẩu chưa khớp.');return;}
+    }else if(!pwCopied)pwCopied=await copyText(a);   // mật khẩu tạo sẵn: tự sao chép để không bị mất
+  }else if(!a){pwSay('Vui lòng nhập mật khẩu.');return;}
+  btn.disabled=true; pwSay('Đang xử lý…');
   try{
-    const ok=await pwAfter(a);
-    if(ok===false){msg.textContent='Mật khẩu không đúng hoặc file đã bị sửa.';return;}
+    const ok=await pwAfter(a,{generated:gen,copied:pwCopied});
+    if(ok===false){pwSay('Mật khẩu không đúng hoặc file đã bị sửa.');return;}
     closePassword();
-  }catch(e){msg.textContent='Có lỗi: '+e.message;}
+  }catch(e){pwSay('Có lỗi: '+e.message);}
   finally{btn.disabled=false;}
 }
 async function encryptPack(password,pack){
@@ -5469,13 +5592,15 @@ function exportProfilesFile(){
   const ps=refreshProfiles();
   if(!ps.length){showWarn('Chưa có hồ sơ nào để xuất.');return}
   if(!cryptoOK()){showWarn('Trình duyệt này không hỗ trợ mã hóa nên không xuất được file dữ liệu. Hãy mở ứng dụng qua địa chỉ https.');return}
-  openPassword('export',async pw=>{
+  openPassword('export',async (pw,info)=>{
     const pack={app:'tinhanphat', type:'profiles', version:1,
                 exported:new Date().toISOString(), count:ps.length, profiles:ps};
     const file=await encryptPack(pw,pack);
     saveBlob(new Blob([JSON.stringify(file)],{type:'application/json'}),'ho-so-doi-pham-nhan-'+dateStamp()+'.json');
     markBackupDone();
-    showWarn('Đã xuất file dữ liệu đã mã hóa ('+ps.length+' hồ sơ). Gửi mật khẩu cho người nhận qua kênh khác với file.');
+    showWarn('Đã xuất file dữ liệu đã mã hóa ('+ps.length+' hồ sơ).'
+      +(info&&info.generated?' Mật khẩu: '+pw+(info.copied?' (đã sao chép)':'')+'. Hãy lưu lại — không có mật khẩu này sẽ không mở được file.':'')
+      +' Gửi mật khẩu cho người nhận qua kênh khác với file.');
     return true;
   });
 }
@@ -6450,6 +6575,7 @@ function rowToProfile(get,today){
   if(!name)return {err:'thiếu họ tên'};
   const arrestText=xlDate(get('arrest')), arrest=strictDMY(arrestText);
   if(!arrest)return {err:'ngày bắt không hợp lệ ('+(String(get('arrest')||'').trim()||'trống')+')'};
+  if(today&&arrest>today)return {err:'ngày bắt '+arrestText+' sau ngày hôm nay'};
   let sent;
   if([get('sY'),get('sM'),get('sD')].some(v=>String(v||'').trim()!=='')){
     const y=xlInt(get('sY')),m=xlInt(get('sM')),d=xlInt(get('sD'));
@@ -6667,10 +6793,10 @@ const SELFTEST_FINGERPRINTS={
   "Quý đủ điều kiện xếp loại (completedQuarters)":"f8efce41",
   "Đợt xét giảm án (findEligibleReview)":"23f17c8a",
   "Hiển thị năm/tháng/ngày (fmtDays, addYMD)":"69f1291e",
-  "Hồ sơ cập nhật theo ngày (liveProfileValues)":"cddcb8e0",
+  "Hồ sơ cập nhật theo ngày (liveProfileValues)":"2686c1da",
   "Tự xếp loại Điều 25, 26 (autoGrades)":"0a031ee9",
   "Kết luận xét giảm án (evaluateRemission)":"6da9f4dd",
-  "Trốn/tạm đình chỉ (computeSentence)":"28413467"
+  "Trốn/tạm đình chỉ (computeSentence)":"a3ed1e8b"
 };
 
 function selfTestCases(){
@@ -6712,7 +6838,19 @@ function selfTestCases(){
       '01/10/2020 | 01/01/2021 | 01/10/2021 | hết án 01/04/2023'],
     ['Trốn/tạm đình chỉ — ví dụ trên, tính đến 15/07/2021 (đang trốn): thời gian chấp hành dừng lại',
       ()=>{const r=escCase(D(1,1,2020),36,0,[{from:'01/06/2021',to:'01/09/2021'}],D(15,7,2021));return 'đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
-      'đã chấp hành 1 năm 5 tháng 0 ngày | còn lại 1 năm 7 tháng 0 ngày']
+      'đã chấp hành 1 năm 5 tháng 0 ngày | còn lại 1 năm 7 tháng 0 ngày'],
+    ['Án đã hết từ lâu — bắt 09/03/1984, án 6 năm, tính đến 30/10/2026: đã chấp hành dừng ở mức án',
+      ()=>{const r=computeSentence({name:'',arrestDate:D(9,3,1984),sentMonths:72,sD:0,preDetMonths:0,pdD:0,remMonths:0,remissionsSnapshot:[]},D(30,10,2026),'qlpn');
+        return 'hết án '+fmtDate(r.releaseDate)+' | đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
+      'hết án 09/03/1990 | đã chấp hành 6 năm 0 tháng 0 ngày | còn lại 0 năm 0 tháng 0 ngày'],
+    ['Án đã hết — bắt 09/03/1984, án 6 năm, tạm giam 2 tháng 15 ngày, giảm 1 năm, tính đến 30/10/2026',
+      ()=>{const r=computeSentence({name:'',arrestDate:D(9,3,1984),sentMonths:72,sD:0,preDetMonths:2,pdD:15,remMonths:12,remissionsSnapshot:[]},D(30,10,2026),'qlpn');
+        return 'hết án '+fmtDate(r.releaseDate)+' | đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
+      'hết án 24/12/1988 | đã chấp hành 5 năm 0 tháng 0 ngày | còn lại 0 năm 0 tháng 0 ngày'],
+    ['Án đã hết — bắt 09/03/1984, án 6 năm 6 tháng 20 ngày, trốn 13/11/1985-29/03/1986, tính đến 30/10/2026',
+      ()=>{const r=escCase(D(9,3,1984),78,20,[{from:'13/11/1985',to:'29/03/1986'}],D(30,10,2026));
+        return 'hết án '+fmtDate(r.releaseDate)+' | đã chấp hành '+ymd(r.servedDiff)+' | còn lại '+ymd(r.remainingDiff);},
+      'hết án 15/02/1991 | đã chấp hành 6 năm 6 tháng 20 ngày | còn lại 0 năm 0 tháng 0 ngày']
   ];
 }
 const ESC_EX=[{from:'13/11/1985',to:'29/03/1986'},{from:'02/04/1986',to:'11/09/2026'}];

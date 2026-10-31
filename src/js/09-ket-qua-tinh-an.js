@@ -6,6 +6,14 @@
 
 const CALC_MODE_NAME={qlpn:'Áp dụng theo phần mềm QLPN cũ', thuc:'Áp dụng theo phần mềm QLPN mới'};
 
+// Đã hết án (ngày tính sau ngày hết án): thời gian đã chấp hành dừng ở mức án, sau khi trừ phần
+// được giảm (tạm giam đã nằm trong đó; thời gian trốn/tạm đình chỉ không tính), không cộng tiếp những ngày
+// sau ngày hết án. Thời hạn còn lại khi đó = 0. Ví dụ: bắt 1984, án 6 năm, tính đến 2026 → 6 năm 0 tháng 0 ngày.
+function servedWhenReleased(sentMonths,sD,remMonths){
+  const m=sentMonths-remMonths;
+  return m<0?{years:0,months:0,days:0}:{years:Math.floor(m/12),months:m%12,days:sD};
+}
+
 // inp : {name, arrestDate, sentMonths, sD, preDetMonths, pdD, remMonths, remissionsSnapshot:[{months}],
 //        escapes:[{from,to,dur,n}] (không bắt buộc) — các lần trốn/tạm đình chỉ}
 // today: ngày tham chiếu; mode: 'qlpn' | 'thuc'
@@ -24,7 +32,8 @@ function computeSentence(inp,today,mode){
   // "Thời gian đã chấp hành": từ ngày bắt đến ngày tham chiếu (ngày bắt là ngày chấp hành thứ 1),
   // cộng thêm thời gian tạm giam (tạm giam được tính là đã chấp hành), quy ước 1 tháng = 30 ngày
   const servedFromArrest=today>=arrestDate?calcServedTime(arrestDate,today):{years:0,months:0,days:0};
-  const servedDiff=addYMD(servedFromArrest,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD});
+  const servedDiff=today>releaseDate?servedWhenReleased(sentMonths,sD,inp.remMonths)
+    :addYMD(servedFromArrest,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD});
   // Mốc 1/4, 1/3, 1/2 so với MỨC ÁN BAN ĐẦU (có trừ tạm giam, không trừ giảm án)
   const m25=calcMilestoneDate(arrestDate,sentMonths,sD,4,preDetMonths,pdD);
   const m33=calcMilestoneDate(arrestDate,sentMonths,sD,3,preDetMonths,pdD);
@@ -40,7 +49,8 @@ function computeSentence(inp,today,mode){
             pct:Math.min(100,Math.round(Math.max(0,elapsedMs-escMsBefore(esc,today))/Math.max(1,totalSentenceMs)*100)),
             left:Math.max(0,Math.ceil((rel-today)/86400000)),
             remainingDiff:remain,
-            servedDiff:addYMD(servedNet,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD}),
+            servedDiff:today>rel?servedWhenReleased(sentMonths,sD,inp.remMonths)
+              :addYMD(servedNet,{years:Math.floor(preDetMonths/12),months:preDetMonths%12,days:pdD}),
             m25:escShift(m25,inp.escapes),m33:escShift(m33,inp.escapes),m50:escShift(m50,inp.escapes),
             esc:inp.escapes,escTotal:sumYMD(esc.map(p=>p.dur))};
   }
@@ -145,18 +155,19 @@ function recomputeByMode(){
   renderResult(computeSentence(lastCalcRaw.inp,lastCalcRaw.today,CALC_MODE),{keepProgress:true});
 }
 
-// Đọc "ngày/tháng/năm" người dùng nhập; năm 1-2 chữ số hiểu là 20xx. Thiếu phần nào thì phần đó = 0.
-function readDateParts(v){
+// Đọc "ngày/tháng/năm" người dùng nhập; năm 1-2 chữ số hiểu theo expandShortYear
+// (past=true: ô chỉ có thể là ngày đã qua, ví dụ ngày bắt). Thiếu phần nào thì phần đó = 0.
+function readDateParts(v,past){
   const p=String(v||'').split('/');
   let yRaw=(p[2]||'').replace(/\D/g,'');
-  if(yRaw.length>=1&&yRaw.length<=2)yRaw='20'+yRaw.padStart(2,'0');
+  if(yRaw.length>=1&&yRaw.length<=2)yRaw=String(expandShortYear(yRaw,past));
   return {d:parseInt(p[0])||0, m:parseInt(p[1])||0, y:parseInt(yRaw)||0};
 }
 
 function calculate(){
   CALC_MODE=CALC_MODE_DEFAULT;   // mở kết quả ở chế độ mặc định đang đặt
   const prisonerName=(document.getElementById('prisonerName').value||'').trim();
-  const a=readDateParts(document.getElementById('arrestDateText').value.trim());
+  const a=readDateParts(document.getElementById('arrestDateText').value.trim(),true);
   const num=id=>parseInt(document.getElementById(id).value)||0;
   const sY=num('sY'), sM=num('sM'), sD=num('sD');
   const pdY=num('pdY'), pdM=num('pdM'), pdD=num('pdD');
@@ -166,12 +177,23 @@ function calculate(){
   if(a.m<1||a.m>12){fieldError(['arrestDateText'],'Tháng phải từ 1 đến 12.');return}
   if(a.d<1||a.d>31){fieldError(['arrestDateText'],'Ngày phải từ 1 đến 31.');return}
   if(a.y<1900||a.y>2100){fieldError(['arrestDateText'],'Năm không hợp lệ.');return}
+  const p2=n=>String(n).padStart(2,'0'), dim=(m,y)=>new Date(y,m,0).getDate();
+  if(a.d>dim(a.m,a.y)){fieldError(['arrestDateText'],'Ngày '+p2(a.d)+'/'+p2(a.m)+'/'+a.y+' không có thật — tháng '+a.m+'/'+a.y+' chỉ có '+dim(a.m,a.y)+' ngày.');return}
   if(!sY&&!sM&&!sD){fieldError(['sY','sM','sD'],'Nhập mức án (năm, tháng hoặc ngày).');return}
   if(refMode==='custom'){
     const rv=document.getElementById('refDate').value.trim();
     const rp=rv.split('/');
     if(!rv||rp.length<3||!parseInt(rp[2])){fieldError(['refDate'],'Nhập ngày giả định, ví dụ 17/06/2026.');return}
+    const r=readDateParts(rv);
+    if(r.m<1||r.m>12||r.d<1||r.y<1900||r.y>2100||r.d>dim(r.m,r.y)){fieldError(['refDate'],'Ngày giả định '+rv+' không có thật.');return}
   }
+  // Ngày bắt phải từ ngày tính trở về trước (thường do gõ nhầm năm, ví dụ 2084 thay cho 1984)
+  const arrD=new Date(a.y,a.m-1,a.d), refD=getRefDate();
+  if(arrD>refD){
+    const custom=refMode==='custom';
+    fieldError(custom?['arrestDateText','refDate']:['arrestDateText'],
+      'Ngày bắt '+fmtDate(arrD)+' sau '+(custom?'ngày giả định ':'ngày hôm nay ')+fmtDate(refD)+'. Kiểm tra lại năm.');
+    return}
 
   // Đã nhập kỳ giảm đầu tiên mà chưa được hỏi -> hiện popup chọn kỳ giảm trước
   if(!k7PickShown && !pickedReduction && remissions[0] && ((remissions[0].years||0)||(remissions[0].months||0))){

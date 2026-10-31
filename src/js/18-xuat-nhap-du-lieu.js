@@ -4,13 +4,15 @@ function exportProfilesFile(){
   const ps=refreshProfiles();
   if(!ps.length){showWarn('Chưa có hồ sơ nào để xuất.');return}
   if(!cryptoOK()){showWarn('Trình duyệt này không hỗ trợ mã hóa nên không xuất được file dữ liệu. Hãy mở ứng dụng qua địa chỉ https.');return}
-  openPassword('export',async pw=>{
+  openPassword('export',async (pw,info)=>{
     const pack={app:'tinhanphat', type:'profiles', version:1,
                 exported:new Date().toISOString(), count:ps.length, profiles:ps};
     const file=await encryptPack(pw,pack);
     saveBlob(new Blob([JSON.stringify(file)],{type:'application/json'}),'ho-so-doi-pham-nhan-'+dateStamp()+'.json');
     markBackupDone();
-    showWarn('Đã xuất file dữ liệu đã mã hóa ('+ps.length+' hồ sơ). Gửi mật khẩu cho người nhận qua kênh khác với file.');
+    showWarn('Đã xuất file dữ liệu đã mã hóa ('+ps.length+' hồ sơ).'
+      +(info&&info.generated?' Mật khẩu: '+pw+(info.copied?' (đã sao chép)':'')+'. Hãy lưu lại — không có mật khẩu này sẽ không mở được file.':'')
+      +' Gửi mật khẩu cho người nhận qua kênh khác với file.');
     return true;
   });
 }

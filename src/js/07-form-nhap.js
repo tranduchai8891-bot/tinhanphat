@@ -10,7 +10,7 @@ function formMilestoneInfo(){
   const d=parseInt(p[0]),m=parseInt(p[1]);
   let y=parseInt((p[2]||'').replace(/\D/g,''));
   if(!d||!m||!y)return null;
-  if(String(p[2]).replace(/\D/g,'').length<=2)y=2000+y;
+  if(String(p[2]).replace(/\D/g,'').length<=2)y=expandShortYear(y,true);
   const arrest=new Date(y,m-1,d);
   const iv=id=>parseInt((document.getElementById(id).value||'').replace(/[^\d]/g,''))||0;
   const sentMonths=iv('sY')*12+iv('sM'), sD=iv('sD');
@@ -289,6 +289,7 @@ function updateAlert(daysLeft){
 function clearInput(id){
   const el=document.getElementById(id);
   el.value='';
+  dateAdjustNote(el,'');
   toggleClearBtn(el);
   el.focus();
 }
@@ -412,10 +413,11 @@ function formatDateInput(el){
   }
 
   // --- KẸP THÁNG > 12 về 12 (khi đã đủ 2 chữ số tháng) ---
+  let adjMsg='';   // câu báo khi phần mềm phải tự sửa ngày/tháng không có thật
   if(monthPart.length===2){
     const mm=parseInt(monthPart);
-    if(mm>12)monthPart='12';
-    if(mm===0)monthPart='01';
+    if(mm>12){monthPart='12';adjMsg='Không có tháng '+mm+' — đã sửa thành tháng 12. Kiểm tra lại.';}
+    if(mm===0){monthPart='01';adjMsg='Không có tháng 00 — đã sửa thành tháng 01. Kiểm tra lại.';}
   }
 
   // --- KẸP NGÀY không hợp lệ về ngày cuối tháng ---
@@ -433,7 +435,11 @@ function formatDateInput(el){
       }else{
         maxDay=new Date(2024,mm,0).getDate();
       }
-      if(dd>maxDay){dd=maxDay;dayPart=String(dd).padStart(2,'0');}
+      if(dd>maxDay){
+        adjMsg=(mm===2&&yearPart.length!==4?'Tháng 2 có nhiều nhất 29 ngày':'Tháng '+mm+(yearPart.length===4?'/'+yearPart:'')+' chỉ có '+maxDay+' ngày')
+          +' — đã sửa ngày '+dd+' thành '+maxDay+'. Kiểm tra lại.';
+        dd=maxDay;dayPart=String(dd).padStart(2,'0');
+      }
     }
   }
 
@@ -453,6 +459,7 @@ function formatDateInput(el){
   }
 
   el.value=formatted;
+  dateAdjustNote(el,adjMsg);
 
   // --- Khôi phục vị trí con trỏ ---
   let newPos;
@@ -482,8 +489,33 @@ function formatDateInput(el){
   try{el.setSelectionRange(newPos,newPos);}catch(e){}
 }
 
-// Khi rời ô (blur): nếu phần năm chỉ có 1-2 chữ số thì hiểu là nhập tắt -> mở rộng thành 20xx.
-// Ví dụ: 01 -> 2001, 18 -> 2018, 5 -> 2005. (Chỉ áp dụng năm 2000-2999.)
+// Năm gõ tắt 1-2 chữ số -> năm đủ 4 chữ số. Mặc định hiểu là 20xx (18 -> 2018, 5 -> 2005).
+// Với các ô chỉ có thể là ngày đã qua (ngày bắt, ngày đến trại, ngày trốn/tạm đình chỉ, kỳ giảm đã xét,
+// ngày quyết định kỷ luật): nếu 20xx lớn hơn năm hiện tại thì hiểu là 19xx (năm 2026: 84 -> 1984, 26 -> 2026).
+// Ô "ngày giả định" và các ô có thể là ngày tương lai luôn hiểu là 20xx.
+const PAST_DATE_FIELD=/^(arrestDateText|rmArrival|rmK7Date|rmK8DecDate|k7PickDate|esc[FT]\d+)$/;
+function expandShortYear(yy,past){
+  const n=parseInt(String(yy),10)||0, y=2000+n;
+  return past&&y>new Date().getFullYear()?1900+n:y;
+}
+
+// Báo nhẹ (chữ cam) ngay dưới ô khi phần mềm tự sửa ngày/tháng không có thật, để người nhập kiểm tra lại.
+// Dòng báo giữ nguyên khi gõ tiếp phần năm; tự mất khi sửa lại phần ngày/tháng hoặc xóa ô.
+// Ô ngày bắt không hiện dòng báo này (theo yêu cầu); khi bấm Tính vẫn kiểm tra ngày có thật hay không.
+const NO_ADJUST_NOTE=new Set(['arrestDateText']);
+function dateAdjustNote(el,msg){
+  if(!el||NO_ADJUST_NOTE.has(el.id))return;
+  const host=el.closest('.input-clearable')||el;
+  let n=host.nextElementSibling;
+  if(!(n&&n.classList.contains('date-adjust')))n=null;
+  const dm=el.value.slice(0,5);
+  if(msg){
+    if(!n){n=document.createElement('div');n.className='date-adjust';n.setAttribute('role','status');host.after(n);}
+    n.textContent=msg; el.dataset.adjDm=dm;
+  }else if(n&&(el.dataset.adjDm!==dm||!el.value)){n.remove();delete el.dataset.adjDm;}
+}
+
+// Khi rời ô (blur): nếu phần năm chỉ có 1-2 chữ số thì hiểu là nhập tắt -> mở rộng thành năm đủ (xem expandShortYear).
 // Năm đã đủ 4 chữ số thì giữ nguyên (cách nhập bình thường).
 function expandYearOnBlur(el){
   const v=el.value.trim();
@@ -495,9 +527,7 @@ function expandYearOnBlur(el){
   let yearPart=(segs[2]||'').replace(/\D/g,'');
 
   if(yearPart.length>=1 && yearPart.length<=2){
-    // 1 chữ số: pad 0 thành 2 chữ số (vd '5' -> '05'), rồi thêm '20' phía trước
-    const yy=yearPart.padStart(2,'0');
-    yearPart='20'+yy;
+    yearPart=String(expandShortYear(yearPart,PAST_DATE_FIELD.test(el.id||'')));
     el.value=dayPart+'/'+monthPart+'/'+yearPart;
     // Sau khi mở rộng năm, nếu là tháng 2 cần kiểm tra lại ngày nhuận
     if(monthPart.length===2 && dayPart.length===2){
@@ -505,7 +535,10 @@ function expandYearOnBlur(el){
       let dd=parseInt(dayPart);
       if(mm>=1 && mm<=12 && yyyy>=1900){
         const maxDay=new Date(yyyy,mm,0).getDate();
-        if(dd>maxDay){dd=maxDay;el.value=String(dd).padStart(2,'0')+'/'+monthPart+'/'+yearPart;}
+        if(dd>maxDay){
+          el.value=String(maxDay).padStart(2,'0')+'/'+monthPart+'/'+yearPart;
+          dateAdjustNote(el,'Tháng '+mm+'/'+yyyy+' chỉ có '+maxDay+' ngày — đã sửa ngày '+dd+' thành '+maxDay+'. Kiểm tra lại.');
+        }
       }
     }
   }
