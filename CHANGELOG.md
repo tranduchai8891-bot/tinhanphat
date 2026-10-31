@@ -1,5 +1,14 @@
 # Nhật ký thay đổi
 
+## v96 — 31/10/2026
+
+- Nút **"Chia sẻ dữ liệu"** chuyển từ khung "Hồ sơ đội phạm nhân" xuống **chân trang**, thay cho nút "Chữ lớn".
+  - Nút luôn hiện, kể cả khi máy chưa có hồ sơ, nên máy mới cũng nhập được file dữ liệu.
+  - Hồ sơ đang khóa thì bấm nút sẽ phải nhập mã PIN trước, nhập đúng mới mở các lựa chọn xuất/nhập.
+- Bỏ chế độ "Chữ lớn". Máy đã từng bật chữ lớn nay hiển thị cỡ thường.
+- Hướng dẫn: bỏ mục "Chữ lớn"; ghi rõ nút "Chia sẻ dữ liệu" ở cuối trang.
+- Kiểm thử: nhóm "Báo lỗi tại ô nhập, chữ lớn" đổi thành "Báo lỗi tại ô nhập, chân trang" (15 mục).
+
 ## v95 — 31/10/2026
 
 **Hiển thị gọn**

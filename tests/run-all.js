@@ -14,7 +14,7 @@ const SUITES=[
   ['Tổng quan đội, đề nghị xét giảm, in','e2e/tong-quan-xet-giam.js'],
   ['Xếp loại quý, dòng thời gian, phiếu in','e2e/xep-loai-dong-thoi-gian-in.js'],
   ['Nhập hồ sơ từ Excel/CSV','e2e/nhap-excel.js'],
-  ['Báo lỗi tại ô nhập, chữ lớn','e2e/bao-loi-chu-lon.js'],
+  ['Báo lỗi tại ô nhập, chân trang','e2e/bao-loi-chan-trang.js'],
   ['Nhập ngày, mật khẩu file xuất','e2e/nhap-ngay-mat-khau.js'],
   ['Án đã hết: dừng ở mức án','e2e/an-da-het.js'],
   ['Định dạng gọn, Khoản 7 cùng đợt năm sau','e2e/dinh-dang-gon-khoan-7.js']

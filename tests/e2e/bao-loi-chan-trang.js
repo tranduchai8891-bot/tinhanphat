@@ -1,4 +1,4 @@
-// Kiểm tra báo lỗi tại ô nhập và chế độ chữ lớn
+// Kiểm tra báo lỗi tại ô nhập và chân trang (nút Chia sẻ dữ liệu thay cho nút Chữ lớn)
 const path=require('path');
 const {chromium}=require('playwright');
 const file='file://'+path.resolve(process.argv[2]);
@@ -34,30 +34,42 @@ const file='file://'+path.resolve(process.argv[2]);
   s=await st();
   ok(s.modal&&!s.errs.length,'Đủ thông tin: ra kết quả, không còn báo lỗi');
   await ev(()=>closeModal());
-  // 4. Chữ lớn
-  const btn=()=>ev(()=>document.getElementById('bigTextBtn').textContent);
-  ok((await btn())==='Chữ lớn: Tắt','Nút "Chữ lớn" ở cuối trang (đang tắt)');
-  const fs1=await ev(()=>document.querySelector('.card-title').getBoundingClientRect().height);
-  await ev(()=>toggleBigText());
-  const fs2=await ev(()=>document.querySelector('.card-title').getBoundingClientRect().height);
-  ok((await btn())==='Chữ lớn: Bật'&&fs2>fs1*1.08,'Bật chữ lớn: chữ to hơn ('+fs1.toFixed(1)+' → '+fs2.toFixed(1)+')');
-  await pg.reload();await pg.waitForTimeout(1300);
-  ok(await ev(()=>document.documentElement.classList.contains('big'))&&(await btn())==='Chữ lớn: Bật','Tải lại trang: vẫn giữ chữ lớn');
+  // 4. Chân trang: nút "Chia sẻ dữ liệu" thay cho nút "Chữ lớn"
+  const foot=await ev(()=>[...document.querySelectorAll('.footer .footer-guide-btn')].map(b=>b.textContent.trim()));
+  ok(foot.join(' | ')==='📖 Hướng dẫn sử dụng | Bảo mật | 🔄 Chia sẻ dữ liệu','Chân trang: '+foot.join(' | ')+' (không còn nút Chữ lớn)');
+  ok(!(await ev(()=>!!document.querySelector('#profileCard [onclick="openShareOpt()"]'))),'Khung Hồ sơ đội phạm nhân không còn nút Chia sẻ dữ liệu');
+  ok(await ev(()=>getComputedStyle(document.getElementById('profileCard')).display==='none'&&!loadProfiles().length),'  (máy chưa có hồ sơ: khung Hồ sơ đang ẩn)');
+  await pg.click('#shareFooterBtn');
+  const opts=await ev(()=>({show:document.getElementById('shareOptOverlay').style.display==='flex',t:[...document.querySelectorAll('#shareOptOverlay .exp-opt-t')].map(x=>x.textContent)}));
+  ok(opts.show&&opts.t.join(',')==='Xuất dữ liệu,Nhập dữ liệu,Nhập danh sách từ Excel,Tải file Excel mẫu','Bấm nút ở chân trang: mở popup Chia sẻ dữ liệu ngay cả khi chưa có hồ sơ ('+opts.t.join(', ')+')');
+  await ev(()=>closeShareOpt());
+  // Máy đã từng bật chữ lớn ở bản trước: nay hiển thị cỡ thường
+  await ev(()=>localStorage.setItem('prison_big_text','1'));await pg.reload();await pg.waitForTimeout(1300);
+  ok(!(await ev(()=>document.documentElement.classList.contains('big'))),'Máy đã từng bật chữ lớn: nay hiển thị cỡ thường');
+  // Đang khóa PIN: bấm Chia sẻ dữ liệu thì hỏi mã PIN trước, đúng mã mới mở popup
+  await ev(async()=>{await enablePin('246810');await lockNow();});
+  await pg.click('#shareFooterBtn');await pg.waitForTimeout(200);
+  const lk=await ev(()=>({pin:getComputedStyle(document.getElementById('pinOverlay')).display!=='none',share:document.getElementById('shareOptOverlay').style.display==='flex'}));
+  ok(lk.pin&&!lk.share,'Đang khóa PIN: bấm Chia sẻ dữ liệu thì hỏi mã PIN trước');
+  await ev(async()=>{document.getElementById('pinA').value='246810';await confirmPin();});await pg.waitForTimeout(400);
+  ok(await ev(()=>document.getElementById('shareOptOverlay').style.display==='flex'),'  Nhập đúng mã PIN: mở popup Chia sẻ dữ liệu');
+  await ev(()=>closeShareOpt());
   const lay=await ev(()=>{const s=(i,v)=>document.getElementById(i).value=v;s('arrestDateText','09/03/1984');s('sY','6 năm');s('sM','6 tháng');s('sD','20 ngày');
-    escapes=[{from:'13/11/1985',to:'29/03/1986'}];k7PickShown=true;calculate();
+    escapes=[{from:'13/11/1985',to:'29/03/1986'}];escOwner=null;k7PickShown=true;calculate();
     const box=document.querySelector('#modalOverlay .modal-box').getBoundingClientRect();
     const r={docW:document.documentElement.scrollWidth,vw:innerWidth,boxOk:box.left>=0&&box.right<=innerWidth&&box.top>=0&&box.bottom<=innerHeight};
     closeModal();openEscape();
     const a=document.getElementById('escF0').getBoundingClientRect(),t=document.getElementById('escT0').getBoundingClientRect();
-    r.stack=t.top>a.bottom-1;closeEscape();
+    r.side=Math.abs(t.top-a.top)<2&&t.left>a.right-1;closeEscape();
     goNav('team');const tb=document.querySelector('#teamOverlay .modal-box').getBoundingClientRect(),nav=document.getElementById('bottomNav').getBoundingClientRect();
     r.teamOk=tb.bottom<=nav.top+1&&nav.right<=innerWidth+1;closeTeam();
+    const f=document.querySelector('.footer').getBoundingClientRect();r.footOk=f.right<=innerWidth+1&&f.left>=-1;
     return r;});
-  ok(lay.docW===lay.vw&&lay.boxOk,'Chữ lớn ở màn hình 360px: không tràn ngang, popup kết quả vừa màn hình');
-  ok(lay.stack,'  Ô Từ ngày / Đến ngày tự xếp dọc cho đủ chỗ');
+  ok(lay.docW===lay.vw&&lay.boxOk&&lay.footOk,'Màn hình 360px: không tràn ngang, popup kết quả và chân trang vừa màn hình');
+  ok(lay.side,'  Ô Từ ngày / Đến ngày nằm ngang hàng');
   ok(lay.teamOk,'  Trang Tổng quan không bị thanh điều hướng che');
-  await ev(()=>toggleBigText());
-  ok(!(await ev(()=>document.documentElement.classList.contains('big'))),'Tắt chữ lớn: trở lại cỡ thường');
+  await ev(()=>{const f=document.querySelector('.footer');f.scrollIntoView({block:'end'});});await pg.waitForTimeout(200);
+  await pg.screenshot({path:require('os').tmpdir()+'/chan-trang.png'});
   console.log('Lỗi JS:',errs.length?errs:'không');
   await b.close();
 })();
