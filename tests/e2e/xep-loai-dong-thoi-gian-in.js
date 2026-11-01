@@ -74,10 +74,18 @@ const file='file://'+path.resolve(process.argv[2]);
   const cell=await ev(()=>{const c=document.querySelector('#rmQGrid .qg-cell[data-k="2026-III"]');return c?c.textContent+'|'+c.className:'none';});
   ok(cell.includes('Kém')||cell.includes('qg-kem'),'Mở lại hồ sơ: bảng xếp loại trên trang giảm án có Quý III/2026 Kém ('+cell+')');
   await ev(()=>{closeRemissionPage();closeModal();});
-  // Chuyển quý
+  // Chuyển quý; dòng tóm tắt "X/Y phạm nhân được xếp loại: … tốt; … khá; … trung bình; … kém."
   await ev(()=>openGrades());
+  const sumChk=()=>ev(()=>{const on=[...document.querySelectorAll('#gradeBody .gp-row:not(.off) .gp-opt.on')].map(b=>b.textContent);
+    const c=k=>on.filter(t=>t===k).length, n=document.querySelectorAll('#gradeBody .gp-row').length;
+    return {txt:document.getElementById('gpSum').textContent,
+      exp:(c('Tốt')+c('Khá')+c('TB')+c('Kém'))+'/'+n+' phạm nhân được xếp loại: '+c('Tốt')+' tốt; '+c('Khá')+' khá; '+c('TB')+' trung bình; '+c('Kém')+' kém.',kem:c('Kém')};});
+  let sm=await sumChk();
+  ok(sm.txt===sm.exp&&sm.kem>=1,'Dòng tóm tắt Quý III/2026: "'+sm.txt+'" (khớp từng dòng bên dưới)');
   await pg.click('.gp-arrow[aria-label="Quý trước"]');
   ok((await ev(()=>document.querySelector('.gp-q-name').textContent))==='Quý II/2026','Nút quý trước: Quý II/2026');
+  sm=await sumChk();
+  ok(sm.txt===sm.exp,'  Dòng tóm tắt Quý II/2026: "'+sm.txt+'"');
   ok(await ev(()=>!document.querySelector('.gp-arrow[aria-label="Quý sau"]').disabled),'  (có thể quay lại quý sau)');
   await pg.click('.gp-arrow[aria-label="Quý sau"]');
   ok(await ev(()=>document.querySelector('.gp-arrow[aria-label="Quý sau"]').disabled),'Quý III/2026 là quý mới nhất: không đi tiếp được');

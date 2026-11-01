@@ -3,7 +3,7 @@
    tự động dùng bản đã lưu khi mất mạng), cache-first cho icon.
    Khi cập nhật app: đổi số phiên bản trong src/VERSION rồi chạy "npm run build" (tạo lại sw.js). */
 
-const CACHE_VERSION = 'v95';
+const CACHE_VERSION = 'v96';
 const CACHE_NAME = 'tinhanphat-' + CACHE_VERSION;
 
 const ASSETS = [

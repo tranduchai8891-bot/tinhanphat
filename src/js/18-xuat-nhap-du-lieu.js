@@ -127,7 +127,9 @@ function acceptConfirm(){
   if(typeof fn==='function')fn();
 }
 
+// Nút "Chia sẻ dữ liệu" ở chân trang: đang khóa PIN thì hỏi mã PIN trước rồi mới mở
 function openShareOpt(){
+  if(needUnlock(openShareOpt))return;
   document.getElementById('shareOptOverlay').style.display='flex';
 }
 function closeShareOpt(){

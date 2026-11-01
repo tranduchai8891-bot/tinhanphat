@@ -1,5 +1,18 @@
 # Nhật ký thay đổi
 
+## v96 — 31/10/2026
+
+- Nút **"Chia sẻ dữ liệu"** chuyển từ khung "Hồ sơ đội phạm nhân" xuống **chân trang**, thay cho nút "Chữ lớn".
+  - Nút luôn hiện, kể cả khi máy chưa có hồ sơ, nên máy mới cũng nhập được file dữ liệu.
+  - Hồ sơ đang khóa thì bấm nút sẽ phải nhập mã PIN trước, nhập đúng mới mở các lựa chọn xuất/nhập.
+- Bỏ chế độ "Chữ lớn". Máy đã từng bật chữ lớn nay hiển thị cỡ thường.
+- Popup "Xếp loại thi đua": dòng tóm tắt đổi thành "X/Y phạm nhân được xếp loại: … tốt; … khá; … trung bình; … kém.".
+  - X là số phạm nhân đã có xếp loại Tốt/Khá/TB/Kém trong quý; Y là tổng số phạm nhân trong danh sách.
+  - Người "Chưa ĐK" hoặc chưa đủ thời gian xếp loại quý đó không tính vào X.
+- Hướng dẫn: bỏ mục "Chữ lớn"; ghi rõ nút "Chia sẻ dữ liệu" ở cuối trang.
+- Kiểm thử: nhóm "Báo lỗi tại ô nhập, chữ lớn" đổi thành "Báo lỗi tại ô nhập, chân trang" (15 mục).
+- GitHub Actions: cố định máy chạy kiểm thử ở Ubuntu 24.04. Nhãn `ubuntu-latest` đang chuyển sang Ubuntu 26, nơi bước cài Chromium bị lỗi.
+
 ## v95 — 31/10/2026
 
 **Hiển thị gọn**
