@@ -6426,14 +6426,18 @@ function renderGrades(){
   if(!gpQuarter||!qsAll.some(q=>q.key===gpQuarter))gpQuarter=qsAll[0].key;
   const idx=qsAll.findIndex(q=>q.key===gpQuarter), q=qsAll[idx];
   const rows=gradeRowsFor(q.key);
-  const act=rows.filter(r=>!r.off), notKha=act.filter(r=>r.g!=='Kha').length;
+  // Tóm tắt: số đã xếp loại (Tốt/Khá/TB/Kém) / tổng số phạm nhân trong danh sách, kèm số từng loại
+  const cnt={Tot:0,Kha:0,TB:0,Kem:0};
+  rows.forEach(r=>{if(!r.off&&cnt[r.g]!=null)cnt[r.g]++;});
+  const graded=cnt.Tot+cnt.Kha+cnt.TB+cnt.Kem;
   const opt=(r,k,t)=>'<button type="button" class="gp-opt '+k+(r.g===k?' on':'')+'" aria-pressed="'+(r.g===k)+'" onclick="setTeamGrade('+r.i+',\''+k+'\')">'+t+'</button>';
   let html='<div class="gp-q"><button type="button" class="gp-arrow" aria-label="Quý trước"'+(idx>=qsAll.length-1?' disabled':'')+' onclick="gpQuarter=\''+(qsAll[idx+1]||q).key+'\';renderGrades()">'
     +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>'
     +'<div class="gp-q-mid"><div class="gp-q-name">'+q.label+'</div><div class="gp-q-sub">'+fmtDate(q.start)+' – '+fmtDate(q.end)+'</div></div>'
     +'<button type="button" class="gp-arrow" aria-label="Quý sau"'+(idx<=0?' disabled':'')+' onclick="gpQuarter=\''+(qsAll[idx-1]||q).key+'\';renderGrades()">'
     +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></div>'
-    +'<div class="gp-sum">'+act.length+' người được xếp loại quý này · <b>'+notKha+'</b> người khác Khá · chọn là lưu ngay vào hồ sơ</div>';
+    +'<div class="gp-sum" id="gpSum"><b>'+graded+'/'+rows.length+'</b> phạm nhân được xếp loại: '
+    +cnt.Tot+' tốt; '+cnt.Kha+' khá; '+cnt.TB+' trung bình; '+cnt.Kem+' kém.</div>';
   if(!rows.length)html+='<div class="tp-empty"><b>Chưa có hồ sơ nào.</b></div>';
   html+=rows.map(r=>r.off
     ?'<div class="gp-row off"><div class="gp-top"><span class="gp-name">'+escHtml(r.p.name)+'</span><span class="gp-note">'+r.off+'</span></div></div>'
