@@ -106,13 +106,11 @@ function renderResult(res,opt){
   setText('r-served',fmtDaysFull(res.servedDiff));
   setText('r-remaining',fmtDaysFull(res.remainingDiff));
   setText('r-release',fmtDate(res.releaseDate));
-  // Thẻ trốn/tạm đình chỉ: chỉ dựng khi có
-  const oldEsc=document.getElementById('r-esc-card'); if(oldEsc)oldEsc.remove();
-  if(res.esc){
-    document.getElementById('r-remaining').closest('.result-grid').insertAdjacentHTML('beforeend',
-      '<div class="metric full esc" id="r-esc-card"><div class="lbl">Thời gian trốn/tạm đình chỉ</div>'
-      +'<div class="val">'+ymdText(res.escTotal)+' · '+res.esc.length+' lần</div></div>');
-  }
+  // Thẻ "Trừ tạm giam" (cạnh "Tổng được giảm") và "Trốn/ tạm đình chỉ" (bên trái "Ngày hết án dự kiến"); không có thì ghi 0 ngày
+  setText('r-predet',fmtDays(res.preDetMonths,res.pdD));
+  setText('r-esc',res.esc?ymdText(res.escTotal):'0 ngày');
+  const escN=document.getElementById('r-esc-n');
+  escN.className='metric-sub'+(res.esc?' show c3':''); escN.textContent=res.esc?res.esc.length+' lần':'';
 
   lastProgressPct=res.pct;
   const bar=document.getElementById('progressBar');

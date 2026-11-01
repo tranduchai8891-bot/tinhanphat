@@ -692,6 +692,8 @@ body.typing .bottom-nav{transform:translateY(120%)}
 .esc-total{margin-top:12px;font-size:13px;color:#1a1a2e;text-align:center}
 .esc-total b{color:#7f1d1d}
 .metric.esc{background:#fff4e5;border-color:#f5c396}
+.metric.teal{background:#e9f6f5;border-color:#b3dcd8}
+.metric.teal .val{color:#0f6e68}
 .metric.esc .val{color:#c2410c}
 .tl-dot.red{background:#c62828}
 .esc-pd .rm-lbl{white-space:nowrap;margin-right:10px}
@@ -825,7 +827,8 @@ body.typing .bottom-nav{transform:translateY(120%)}
   /* Modal rộng thêm 5% (680 -> 714px), vẫn chừa lề tránh tai thỏ */
   .modal-overlay{padding-left:max(12px, env(safe-area-inset-left));padding-right:max(12px, env(safe-area-inset-right))}
   .modal-box{max-width:714px}
-  .result-grid{grid-template-columns:1fr 1fr 1fr}
+  /* 8 thẻ: 4 cột x 2 hàng, giữ "Trừ tạm giam" cạnh "Tổng được giảm", "Trốn/ tạm đình chỉ" bên trái "Ngày hết án" */
+  .result-grid{grid-template-columns:repeat(4,1fr)}
   .metric.full{grid-column:auto}
 
   /* Trang trượt (tra cứu) chừa lề an toàn */

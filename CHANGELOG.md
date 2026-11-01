@@ -19,6 +19,11 @@
 - `index.html` nặng thêm khoảng 225 KB, khi tải qua mạng thêm khoảng 175 KB.
 - Giấy phép SIL Open Font License 1.1 kèm trong `src/fonts-license/`.
 
+**Popup "Kết quả tính toán"**
+- Thêm thẻ **"Trừ tạm giam"** cạnh thẻ "Tổng được giảm". "Tổng được giảm" giữ nguyên như cũ, gồm cả tạm giam, khớp với nội dung Sao chép.
+- Thẻ "Thời gian trốn/tạm đình chỉ" đổi thành **"Trốn/ tạm đình chỉ"**, cùng cỡ với các thẻ khác. Thẻ nằm dưới "Tổng được giảm", bên trái "Ngày hết án dự kiến". Số lần ghi ở nhãn nhỏ cạnh tiêu đề, không có thì ghi "0 ngày".
+- Màn hình ngang dùng 4 cột để giữ đúng các vị trí trên.
+
 **Kiểm thử tự động trên GitHub**
 - Ghim các công cụ theo mã băm commit, không theo nhãn `v4` có thể bị đổi:
   - actions/checkout v4.4.0;

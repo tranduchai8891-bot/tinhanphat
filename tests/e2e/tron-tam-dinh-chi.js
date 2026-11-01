@@ -72,13 +72,13 @@ const file='file://'+path.resolve(process.argv[2]);
   await pg.click('.btn-calc');await pg.waitForTimeout(400);
   const R1=await ev(()=>({served:document.getElementById('r-served').textContent,remaining:document.getElementById('r-remaining').textContent,
     release:document.getElementById('r-release').textContent,m:['m-25','m-33','m-50'].map(i=>document.getElementById(i).textContent).join(' '),
-    card:(document.getElementById('r-esc-card')||{}).textContent||'',tl:document.getElementById('timeline').textContent,copy:lastResultText,
+    card:document.getElementById('r-esc').closest('.metric').textContent.replace(/\s+/g,' ').trim(),tl:document.getElementById('timeline').textContent,copy:lastResultText,
     elig:document.getElementById('eligibleText').textContent}));
   ok(R1.served==='1 năm 9 tháng 26 ngày','Thời gian đã chấp hành: '+R1.served);
   ok(R1.remaining==='4 năm 8 tháng 24 ngày','Thời hạn còn lại: '+R1.remaining);
   ok(R1.release==='24/07/2031','Ngày hết án = 29/09/1990 + 40 năm 9 tháng 25 ngày = '+R1.release);
   ok(R1.m==='29/10/1985 11/03/2027 14/04/2028','Mốc 1/4, 1/3, 1/2 dời theo diễn biến: '+R1.m);
-  ok(R1.card==='Thời gian trốn/tạm đình chỉ40 năm 9 tháng 25 ngày · 2 lần','Popup kết quả có thẻ "Thời gian trốn/tạm đình chỉ": '+R1.card);
+  ok(R1.card==='Trốn/ tạm đình chỉ2 lần40 năm 9 tháng 25 ngày','Popup kết quả có thẻ "Trốn/ tạm đình chỉ": '+R1.card);
   ok(R1.tl.includes('Trốn/tạm đình chỉ lần 2: 02/04/1986 – 11/09/2026+ 40 năm 5 tháng 9 ngày'),'Dòng thời gian liệt kê từng lần');
   ok(R1.copy.includes('Thời gian trốn/tạm đình chỉ: 40 năm 9 tháng 25 ngày (2 lần)\n  Lần 1: 13/11/1985 - 29/03/1986 (4 tháng 16 ngày)')&&R1.copy.includes('Ngày hết án dự kiến: 24/07/2031'),'Văn bản Sao chép có các lần trốn/tạm đình chỉ');
   ok(R1.elig.includes('11/03/2027'),'Dòng đợt xét giảm dùng mốc 1/3 đã dời: '+R1.elig.slice(0,60));
@@ -98,7 +98,7 @@ const file='file://'+path.resolve(process.argv[2]);
   const H=await ev(()=>{const h=loadHistory()[0];return {escape:h.escape,prof:(h._prof.escapes||[]).length,raw:(h._raw.escapes||[]).length,release:h.release,served:h.served};});
   ok(H.escape==='40 năm 9 tháng 25 ngày'&&H.prof===2&&H.raw===2&&H.release==='24/07/2031','Lịch sử lưu đủ 2 lần trốn/tạm đình chỉ');
   await ev(()=>{closeModal();openHistoryDetail(0);});
-  ok((await txt('r-release'))==='24/07/2031'&&(await txt('r-remaining'))==='4 năm 8 tháng 24 ngày'&&(await txt('r-esc-card')||'').includes('2 lần'),'Xem lại lịch sử: đúng kết quả có trốn/tạm đình chỉ');
+  ok((await txt('r-release'))==='24/07/2031'&&(await txt('r-remaining'))==='4 năm 8 tháng 24 ngày'&&(await txt('r-esc-n'))==='2 lần','Xem lại lịch sử: đúng kết quả có trốn/tạm đình chỉ');
 
   // 7. Hồ sơ: lưu, chi tiết, cập nhật theo ngày hiện tại
   await ev(()=>{closeModal();saveProfileFromHistory(0);closeSecurity&&closeSecurity();closeQuarterWarn&&closeQuarterWarn();});
@@ -121,7 +121,7 @@ const file='file://'+path.resolve(process.argv[2]);
   const cf=await ev(()=>({show:document.getElementById('confirmOverlay').style.display==='flex',t:document.getElementById('cfmTitle').textContent,res:document.getElementById('modalOverlay').classList.contains('show')}));
   ok(cf.show&&!cf.res&&cf.t.includes('của phạm nhân Lê Văn T (bắt 09/03/1984)'),'Tính cho phạm nhân khác khi còn dữ liệu trốn của người trước: hỏi lại, chưa tính ('+cf.t.slice(0,70)+'…)');
   await ev(()=>{closeConfirm();openEscape();clearEscAll();saveEscape();calculate();});
-  ok(await ev(()=>document.getElementById('modalOverlay').classList.contains('show')&&!document.getElementById('r-esc-card')),'  Xóa dữ liệu trốn rồi tính: ra kết quả không có trốn');
+  ok(await ev(()=>document.getElementById('modalOverlay').classList.contains('show')&&document.getElementById('r-esc').textContent==='0 ngày'&&!document.getElementById('r-esc-n').textContent),'  Xóa dữ liệu trốn rồi tính: ra kết quả không có trốn (thẻ ghi 0 ngày)');
   await ev(()=>{closeModal();saveProfileFromHistory(0);closeQuarterWarn&&closeQuarterWarn();});
   await ev(()=>{const i=loadProfiles().findIndex(p=>p.name==='Lê Văn T');loadProfile(i);closeQuarterWarn&&closeQuarterWarn();});
   ok((await ev(()=>escapes.length))===2,'  Mở lại hồ sơ Lê Văn T: có 2 lần');
@@ -144,7 +144,7 @@ const file='file://'+path.resolve(process.argv[2]);
      'Trốn 01/06/2021-01/09/2021 (sau mốc 1/4, 1/3): chỉ mốc 1/2 và ngày hết án dời 3 tháng');
   // Xóa hết -> trở lại như chưa nhập
   await ev(()=>{closeModal();openEscape();clearEscAll();saveEscape();calculate();});
-  ok((await txt('escSummary'))===''&&!(await ev(()=>!!document.getElementById('r-esc-card')))&&(await txt('r-release'))==='01/01/2023','Xóa hết rồi Lưu: kết quả trở lại như không có trốn');
+  ok((await txt('escSummary'))===''&&(await txt('r-esc'))==='0 ngày'&&(await txt('r-release'))==='01/01/2023','Xóa hết rồi Lưu: kết quả trở lại như không có trốn');
 
   // 10. Excel lịch sử + hồ sơ có cột Trốn/tạm đình chỉ
   await ev(()=>closeModal());

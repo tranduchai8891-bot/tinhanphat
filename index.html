@@ -711,6 +711,8 @@ body.typing .bottom-nav{transform:translateY(120%)}
 .esc-total{margin-top:12px;font-size:13px;color:#1a1a2e;text-align:center}
 .esc-total b{color:#7f1d1d}
 .metric.esc{background:#fff4e5;border-color:#f5c396}
+.metric.teal{background:#e9f6f5;border-color:#b3dcd8}
+.metric.teal .val{color:#0f6e68}
 .metric.esc .val{color:#c2410c}
 .tl-dot.red{background:#c62828}
 .esc-pd .rm-lbl{white-space:nowrap;margin-right:10px}
@@ -844,7 +846,8 @@ body.typing .bottom-nav{transform:translateY(120%)}
   /* Modal rộng thêm 5% (680 -> 714px), vẫn chừa lề tránh tai thỏ */
   .modal-overlay{padding-left:max(12px, env(safe-area-inset-left));padding-right:max(12px, env(safe-area-inset-right))}
   .modal-box{max-width:714px}
-  .result-grid{grid-template-columns:1fr 1fr 1fr}
+  /* 8 thẻ: 4 cột x 2 hàng, giữ "Trừ tạm giam" cạnh "Tổng được giảm", "Trốn/ tạm đình chỉ" bên trái "Ngày hết án" */
+  .result-grid{grid-template-columns:repeat(4,1fr)}
   .metric.full{grid-column:auto}
 
   /* Trang trượt (tra cứu) chừa lề an toàn */
@@ -1509,6 +1512,8 @@ body.typing .bottom-nav{transform:translateY(120%)}
           <div class="metric pink"><div class="lbl">Ngày bắt</div><div class="val" id="r-arrest"></div></div>
           <div class="metric"><div class="lbl lbl-tag"><span class="lbl-txt">Mức án</span><span class="metric-sub" id="r-class" title="Phân loại theo Điều 9 BLHS – suy từ mức án đã tuyên, chỉ mang tính tham khảo"></span></div><div class="val" id="r-original"></div></div>
           <div class="metric green"><div class="lbl">Tổng được giảm</div><div class="val" id="r-reduced"></div></div>
+          <div class="metric teal"><div class="lbl">Trừ tạm giam</div><div class="val" id="r-predet"></div></div>
+          <div class="metric esc"><div class="lbl lbl-tag"><span class="lbl-txt">Trốn/ tạm đình chỉ</span><span class="metric-sub" id="r-esc-n"></span></div><div class="val" id="r-esc"></div></div>
           <div class="metric release"><div class="lbl">Ngày hết án dự kiến</div><div class="val" id="r-release"></div></div>
           <div class="metric blue"><div class="lbl">Thời gian đã chấp hành</div><div class="val" id="r-served"></div></div>
           <div class="metric lime"><div class="lbl">Thời hạn còn lại</div><div class="val" id="r-remaining"></div></div>
@@ -2984,13 +2989,11 @@ function renderResult(res,opt){
   setText('r-served',fmtDaysFull(res.servedDiff));
   setText('r-remaining',fmtDaysFull(res.remainingDiff));
   setText('r-release',fmtDate(res.releaseDate));
-  // Thẻ trốn/tạm đình chỉ: chỉ dựng khi có
-  const oldEsc=document.getElementById('r-esc-card'); if(oldEsc)oldEsc.remove();
-  if(res.esc){
-    document.getElementById('r-remaining').closest('.result-grid').insertAdjacentHTML('beforeend',
-      '<div class="metric full esc" id="r-esc-card"><div class="lbl">Thời gian trốn/tạm đình chỉ</div>'
-      +'<div class="val">'+ymdText(res.escTotal)+' · '+res.esc.length+' lần</div></div>');
-  }
+  // Thẻ "Trừ tạm giam" (cạnh "Tổng được giảm") và "Trốn/ tạm đình chỉ" (bên trái "Ngày hết án dự kiến"); không có thì ghi 0 ngày
+  setText('r-predet',fmtDays(res.preDetMonths,res.pdD));
+  setText('r-esc',res.esc?ymdText(res.escTotal):'0 ngày');
+  const escN=document.getElementById('r-esc-n');
+  escN.className='metric-sub'+(res.esc?' show c3':''); escN.textContent=res.esc?res.esc.length+' lần':'';
 
   lastProgressPct=res.pct;
   const bar=document.getElementById('progressBar');
