@@ -37,8 +37,11 @@ const file='file://'+path.resolve(process.argv[2]);
   // 4. Chân trang: nút "Chia sẻ dữ liệu" thay cho nút "Chữ lớn"
   const foot=await ev(()=>[...document.querySelectorAll('.footer .footer-guide-btn')].map(b=>b.textContent.trim()));
   ok(foot.join(' | ')==='📖 Hướng dẫn sử dụng | Bảo mật | 🔄 Chia sẻ dữ liệu','Chân trang: '+foot.join(' | ')+' (không còn nút Chữ lớn)');
-  ok(!(await ev(()=>!!document.querySelector('#profileCard [onclick="openShareOpt()"]'))),'Khung Hồ sơ đội phạm nhân không còn nút Chia sẻ dữ liệu');
-  ok(await ev(()=>getComputedStyle(document.getElementById('profileCard')).display==='none'&&!loadProfiles().length),'  (máy chưa có hồ sơ: khung Hồ sơ đang ẩn)');
+  ok(!(await ev(()=>!!document.querySelector('#profilesOverlay [onclick="openShareOpt()"]'))),'Popup Hồ sơ đội phạm nhân không có nút Chia sẻ dữ liệu (đã ở chân trang)');
+  await ev(()=>goNav('profiles'));
+  ok(await ev(()=>getComputedStyle(document.getElementById('profileEmpty')).display!=='none'&&getComputedStyle(document.getElementById('profileBtns')).display==='none'&&!loadProfiles().length),
+    '  Máy chưa có hồ sơ: popup Hồ sơ báo "Chưa có hồ sơ nào", có nút nhập từ Excel');
+  await ev(()=>closeProfiles());
   await pg.click('#shareFooterBtn');
   const opts=await ev(()=>({show:document.getElementById('shareOptOverlay').style.display==='flex',t:[...document.querySelectorAll('#shareOptOverlay .exp-opt-t')].map(x=>x.textContent)}));
   ok(opts.show&&opts.t.join(',')==='Xuất dữ liệu,Nhập dữ liệu,Nhập danh sách từ Excel,Tải file Excel mẫu','Bấm nút ở chân trang: mở popup Chia sẻ dữ liệu ngay cả khi chưa có hồ sơ ('+opts.t.join(', ')+')');

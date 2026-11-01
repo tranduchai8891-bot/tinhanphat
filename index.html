@@ -560,9 +560,10 @@ body.typing .bottom-nav{transform:translateY(120%)}
   font-family:'Be Vietnam Pro',-apple-system,sans-serif;font-size:11px;font-weight:600;color:#5b616e;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .bn-item svg{width:22px;height:22px}
 .bn-item.on{color:#7f1d1d;font-weight:800}
-#teamOverlay,#reviewOverlay,#gradeOverlay{z-index:990;padding-bottom:calc(74px + env(safe-area-inset-bottom))}
+#teamOverlay,#reviewOverlay,#gradeOverlay,#profilesOverlay{z-index:990;padding-bottom:calc(74px + env(safe-area-inset-bottom))}
 .team-page .modal-box{height:100%}
 .tp-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.pf-btns{margin-bottom:12px}
 .tp-empty{padding:22px 10px;text-align:center;font-size:13px;color:#525866;line-height:1.6}
 .tp-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px}
 .tp-stat{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1.5px solid #e6e3de;background:#fff;border-radius:12px;padding:10px 12px;
@@ -775,7 +776,8 @@ body.typing .bottom-nav{transform:translateY(120%)}
 #profDetailBody .rm-card{margin-bottom:12px}
 #profDetailBody .qgrid{font-size:10.5px}
 #profDetailBody .qg-cell{padding:6px 2px;font-size:10px}
-#profileList{max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px}
+/* Danh sách hồ sơ nằm trong popup: cuộn cùng popup, không giới hạn chiều cao riêng */
+#profileList{max-height:none;overflow:visible;padding-right:0}
 #profileList::-webkit-scrollbar{width:5px}
 #profileList::-webkit-scrollbar-thumb{background:#d6c39a;border-radius:3px}
 #profileList::-webkit-scrollbar-track{background:transparent}
@@ -1457,6 +1459,7 @@ body.typing .bottom-nav{transform:translateY(120%)}
           <div class="guide-step"><span class="guide-dot"></span><span>Nhấn <b>“Xuất Excel”</b> để tải toàn bộ lịch sử; nhấn “Xóa hết” để xóa lịch sử.</span></div>
           <p class="annex-desc" style="font-weight:600;color:#7f1d1d;margin-top:8px">3.8. Hồ sơ đội phạm nhân</p>
           <div class="guide-step"><span class="guide-dot"></span><span>Ở mỗi mục Lịch sử tra cứu, nhấn <b>“+ Lưu hồ sơ”</b> (hoặc nút <b>“Lưu hồ sơ”</b> cuối trang Tra cứu giảm án) để lưu phạm nhân vào danh sách quản lý. Nếu chưa có tên, phần mềm sẽ hỏi để nhập.</span></div>
+          <div class="guide-step"><span class="guide-dot"></span><span>Bấm mục <b>“Hồ sơ”</b> ở thanh dưới để mở danh sách <b>Hồ sơ đội phạm nhân</b> (hồ sơ đang khóa thì nhập mã PIN trước).</span></div>
           <div class="guide-step"><span class="guide-dot"></span><span>Hồ sơ lưu đầy đủ: ngày bắt, mức án, tạm giam, tiền án, các kỳ giảm án, ngày đến trại, bảng xếp loại và thông tin kỷ luật. Lưu tối đa <b>200 phạm nhân</b>.</span></div>
           <div class="guide-step"><span class="guide-dot"></span><span>Danh sách tự sắp xếp theo <b>tên A → Z</b>; phạm nhân <b>sắp hết án trong vòng 01 tháng</b> được đẩy lên đầu kèm nhãn đỏ nhắc việc.</span></div>
           <div class="guide-step"><span class="guide-dot"></span><span><b>Nhấn vào một phạm nhân</b> để xem nhanh toàn bộ thông tin; trong đó có nút <b>“Sửa thông tin”</b> để nạp hồ sơ trở lại và tính tiếp. Nút <b>“Mở lại”</b> trên thẻ cũng có tác dụng tương tự.</span></div>
@@ -1513,7 +1516,7 @@ body.typing .bottom-nav{transform:translateY(120%)}
           <div class="metric"><div class="lbl lbl-tag"><span class="lbl-txt">Mức án</span><span class="metric-sub" id="r-class" title="Phân loại theo Điều 9 BLHS – suy từ mức án đã tuyên, chỉ mang tính tham khảo"></span></div><div class="val" id="r-original"></div></div>
           <div class="metric green"><div class="lbl">Tổng được giảm</div><div class="val" id="r-reduced"></div></div>
           <div class="metric teal"><div class="lbl">Trừ tạm giam</div><div class="val" id="r-predet"></div></div>
-          <div class="metric esc"><div class="lbl lbl-tag"><span class="lbl-txt">Trốn/ tạm đình chỉ</span><span class="metric-sub" id="r-esc-n"></span></div><div class="val" id="r-esc"></div></div>
+          <div class="metric esc"><div class="lbl lbl-tag"><span class="lbl-txt">Trốn/TĐC</span><span class="metric-sub" id="r-esc-n"></span></div><div class="val" id="r-esc"></div></div>
           <div class="metric release"><div class="lbl">Ngày hết án dự kiến</div><div class="val" id="r-release"></div></div>
           <div class="metric blue"><div class="lbl">Thời gian đã chấp hành</div><div class="val" id="r-served"></div></div>
           <div class="metric lime"><div class="lbl">Thời hạn còn lại</div><div class="val" id="r-remaining"></div></div>
@@ -1579,20 +1582,6 @@ body.typing .bottom-nav{transform:translateY(120%)}
     <button class="modal-btn close lock-btn" onclick="openPin('unlock')">Mở khóa bằng mã PIN</button>
   </div>
 
-  <div class="card" id="profileCard" style="display:none">
-    <div class="history-header-row">
-      <div class="card-title" style="margin-bottom:0">Hồ sơ đội phạm nhân<span id="profileCount" class="history-count"></span></div>
-      <div class="history-btn-group">
-        <button class="history-link-btn export" onclick="openExportOpt()">⬇️ Excel</button>
-        <button class="history-link-btn backup" onclick="openSecurity()">Bảo mật</button>
-        <button class="history-link-btn danger" onclick="clearProfiles()">Xóa hết</button>
-        <input type="file" id="profImportInput" accept=".json,application/json" style="display:none" onchange="importProfilesFile(this)">
-        <input type="file" id="xlImportInput" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" style="display:none" onchange="importExcelFile(this)">
-      </div>
-    </div>
-    <div class="history-list" id="profileList"></div>
-  </div>
-
   <div class="card" id="historyCard" style="display:none">
     <div class="history-header-row">
       <div class="card-title" style="margin-bottom:0">Lịch sử tra cứu<span id="historyCount" class="history-count"></span></div>
@@ -1651,6 +1640,29 @@ body.typing .bottom-nav{transform:translateY(120%)}
       <div class="tp-head"><div class="result-header" style="margin:0">Tổng quan đội<span class="result-refdate" id="teamDate"></span></div>
         <button type="button" class="link-clear" onclick="closeTeam()">Đóng</button></div>
       <div id="teamBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TRANG HỒ SƠ ĐỘI PHẠM NHÂN (mục "Hồ sơ" ở thanh dưới) -->
+<div class="modal-overlay team-page" id="profilesOverlay" onclick="if(event.target===this)closeProfiles()">
+  <div class="modal-box">
+    <div class="modal-scroll" id="profilesScroll">
+      <div class="tp-head"><div class="result-header" style="margin:0">Hồ sơ đội phạm nhân<span id="profileCount" class="result-refdate"></span></div>
+        <button type="button" class="link-clear" onclick="closeProfiles()">Đóng</button></div>
+      <div class="history-btn-group pf-btns" id="profileBtns">
+        <button class="history-link-btn export" onclick="openExportOpt()">⬇️ Excel</button>
+        <button class="history-link-btn backup" onclick="openSecurity()">Bảo mật</button>
+        <button class="history-link-btn danger" onclick="clearProfiles()">Xóa hết</button>
+      </div>
+      <div id="profileEmpty" style="display:none">
+        <div class="tp-empty"><b>Chưa có hồ sơ nào.</b><br>Tính án cho phạm nhân rồi bấm “Lưu hồ sơ”, hoặc nhập cả danh sách từ Excel.</div>
+        <div class="rv-actions"><button type="button" class="modal-btn ghost" onclick="downloadImportTemplate()">Tải file Excel mẫu</button>
+          <button type="button" class="modal-btn close" onclick="startExcelImport()">Nhập từ Excel</button></div>
+      </div>
+      <div class="history-list" id="profileList"></div>
+      <input type="file" id="profImportInput" accept=".json,application/json" style="display:none" onchange="importProfilesFile(this)">
+      <input type="file" id="xlImportInput" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" style="display:none" onchange="importExcelFile(this)">
     </div>
   </div>
 </div>
@@ -4940,6 +4952,7 @@ async function lockNow(){
   profDetailIdx=null;
   const hd=document.getElementById('historyDetailOverlay'); if(hd)hd.classList.remove('show');
   closeModal();
+  if(typeof closeTeamPages==='function'){closeTeamPages();setNav(null);}
   document.body.style.overflow='';
   renderHistory(); renderProfiles();
 }
@@ -5444,15 +5457,20 @@ function sortProfiles(ps){
   });
   return arr;
 }
+// Danh sách nằm trong popup "Hồ sơ đội phạm nhân" (mục Hồ sơ ở thanh dưới)
 function renderProfiles(){
-  const card=document.getElementById('profileCard');
   const list=document.getElementById('profileList');
   const cnt=document.getElementById('profileCount');
-  if(!card||!list)return;
-  if(renderLockCard()){card.style.display='none';return;}
+  const btns=document.getElementById('profileBtns'), empty=document.getElementById('profileEmpty');
+  if(!list)return;
+  if(renderLockCard()){   // đang khóa: xóa danh sách khỏi trang, đóng popup
+    list.innerHTML='';if(cnt)cnt.textContent='';
+    const ov=document.getElementById('profilesOverlay');if(ov&&ov.style.display==='flex')closeProfiles();
+    return;}
   const ps=refreshProfiles();   // cập nhật thông số theo ngày hiện tại
-  if(!ps.length){card.style.display='none';return;}
-  card.style.display='block';
+  if(btns)btns.style.display=ps.length?'':'none';
+  if(empty)empty.style.display=ps.length?'none':'';
+  if(!ps.length){list.innerHTML='';if(cnt)cnt.textContent='';return;}
   if(cnt)cnt.textContent=' ('+ps.length+'/'+PROFILES_MAX+')';
   list.innerHTML=backupReminderHTML()+sortProfiles(ps).map(o=>{
     const p=o.p, i=o.idx;   // i là vị trí GỐC trong mảng lưu trữ
@@ -5601,6 +5619,8 @@ function loadProfile(i){
   const p=sanitizeProfile(loadProfiles()[i]);
   if(!p||!p.data){showWarn('Hồ sơ này chưa có dữ liệu chi tiết.');return}
   const d=p.data;
+  // Mở lại từ popup Hồ sơ / Tổng quan: đóng các trang đó để thấy ngay màn hình tính án
+  closeTeamPages();navMainK='calc';setNav(null);
   const set=(id,v)=>{const el=document.getElementById(id);if(el){el.value=v||'';toggleClearBtn&&el.parentElement&&el.parentElement.querySelector('.input-clear-btn')&&toggleClearBtn(el);}};
   set('prisonerName',p.name);
   set('arrestDateText',d.arrestText);
@@ -6271,7 +6291,7 @@ function backupReminderHTML(){
 }
 
 // ===== THANH ĐIỀU HƯỚNG DƯỚI ĐÁY =====
-const TEAM_PAGES={team:'teamOverlay',review:'reviewOverlay',grades:'gradeOverlay'};
+const TEAM_PAGES={team:'teamOverlay',review:'reviewOverlay',grades:'gradeOverlay',profiles:'profilesOverlay'};
 function closeTeamPages(except){
   Object.keys(TEAM_PAGES).forEach(k=>{if(k!==except){const o=document.getElementById(TEAM_PAGES[k]);if(o)o.style.display='none';}});
 }
@@ -6287,19 +6307,21 @@ function navMainTab(){return navMainK;}
 function goNav(k){
   if(k==='team')return openTeam();
   if(k==='review')return openReview();
+  if(k==='profiles')return openProfiles();
   closeTeamPages();
-  if(k==='profiles'){
-    const lock=document.getElementById('lockCard'), card=document.getElementById('profileCard');
-    const target=(lock&&lock.style.display==='block')?lock:((card&&card.style.display==='block')?card:null);
-    if(!target){showWarn('Chưa có hồ sơ nào. Tính án rồi bấm “Lưu hồ sơ”, hoặc vào Tổng quan để nhập danh sách từ Excel.');setNav(null);return;}
-    navMainK='profiles';setNav(null);
-    // đợi trang vừa đóng mở khóa cuộn rồi mới cuộn tới
-    setTimeout(()=>window.scrollTo({top:target.getBoundingClientRect().top+window.scrollY-12,behavior:'smooth'}),60);
-    return;
-  }
   navMainK='calc';setNav(null);
   setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),60);
 }
+// ===== TRANG HỒ SƠ ĐỘI PHẠM NHÂN (popup, giống trang Tổng quan) =====
+function openProfiles(){
+  if(needUnlock(openProfiles))return;
+  closeTeamPages('profiles');
+  renderProfiles();
+  document.getElementById('profilesOverlay').style.display='flex';
+  document.getElementById('profilesScroll').scrollTop=0;
+  setNav('profiles');
+}
+function closeProfiles(){document.getElementById('profilesOverlay').style.display='none';setNav(null);}
 // Ẩn thanh điều hướng khi đang gõ (bàn phím điện thoại) để không che ô nhập
 document.addEventListener('focusin',e=>{
   const t=e.target;
@@ -6309,13 +6331,6 @@ document.addEventListener('focusout',()=>{setTimeout(()=>{
   const a=document.activeElement;
   if(!a||!(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&!/^(checkbox|radio|button|submit|file)$/i.test(a.type))))document.body.classList.remove('typing');
 },120);});
-// Đang xem phần Hồ sơ/Lịch sử trên trang chính -> sáng mục "Hồ sơ"
-window.addEventListener('scroll',()=>{
-  const card=document.getElementById('profileCard')||null, lock=document.getElementById('lockCard');
-  const t=[card,lock].find(x=>x&&x.style.display==='block');
-  const k=(t&&t.getBoundingClientRect().top<window.innerHeight*0.5)?'profiles':'calc';
-  if(k!==navMainK){navMainK=k;if(!Object.values(TEAM_PAGES).some(id=>{const o=document.getElementById(id);return o&&o.style.display==='flex';}))setNav(null);}
-},{passive:true});
 
 // =====================================================================================
 // XẾP LOẠI QUÝ CẢ ĐỘI · DÒNG THỜI GIAN · PHIẾU IN A4

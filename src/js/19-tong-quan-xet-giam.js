@@ -296,7 +296,7 @@ function backupReminderHTML(){
 }
 
 // ===== THANH ĐIỀU HƯỚNG DƯỚI ĐÁY =====
-const TEAM_PAGES={team:'teamOverlay',review:'reviewOverlay',grades:'gradeOverlay'};
+const TEAM_PAGES={team:'teamOverlay',review:'reviewOverlay',grades:'gradeOverlay',profiles:'profilesOverlay'};
 function closeTeamPages(except){
   Object.keys(TEAM_PAGES).forEach(k=>{if(k!==except){const o=document.getElementById(TEAM_PAGES[k]);if(o)o.style.display='none';}});
 }
@@ -312,19 +312,21 @@ function navMainTab(){return navMainK;}
 function goNav(k){
   if(k==='team')return openTeam();
   if(k==='review')return openReview();
+  if(k==='profiles')return openProfiles();
   closeTeamPages();
-  if(k==='profiles'){
-    const lock=document.getElementById('lockCard'), card=document.getElementById('profileCard');
-    const target=(lock&&lock.style.display==='block')?lock:((card&&card.style.display==='block')?card:null);
-    if(!target){showWarn('Chưa có hồ sơ nào. Tính án rồi bấm “Lưu hồ sơ”, hoặc vào Tổng quan để nhập danh sách từ Excel.');setNav(null);return;}
-    navMainK='profiles';setNav(null);
-    // đợi trang vừa đóng mở khóa cuộn rồi mới cuộn tới
-    setTimeout(()=>window.scrollTo({top:target.getBoundingClientRect().top+window.scrollY-12,behavior:'smooth'}),60);
-    return;
-  }
   navMainK='calc';setNav(null);
   setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),60);
 }
+// ===== TRANG HỒ SƠ ĐỘI PHẠM NHÂN (popup, giống trang Tổng quan) =====
+function openProfiles(){
+  if(needUnlock(openProfiles))return;
+  closeTeamPages('profiles');
+  renderProfiles();
+  document.getElementById('profilesOverlay').style.display='flex';
+  document.getElementById('profilesScroll').scrollTop=0;
+  setNav('profiles');
+}
+function closeProfiles(){document.getElementById('profilesOverlay').style.display='none';setNav(null);}
 // Ẩn thanh điều hướng khi đang gõ (bàn phím điện thoại) để không che ô nhập
 document.addEventListener('focusin',e=>{
   const t=e.target;
@@ -334,10 +336,3 @@ document.addEventListener('focusout',()=>{setTimeout(()=>{
   const a=document.activeElement;
   if(!a||!(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&!/^(checkbox|radio|button|submit|file)$/i.test(a.type))))document.body.classList.remove('typing');
 },120);});
-// Đang xem phần Hồ sơ/Lịch sử trên trang chính -> sáng mục "Hồ sơ"
-window.addEventListener('scroll',()=>{
-  const card=document.getElementById('profileCard')||null, lock=document.getElementById('lockCard');
-  const t=[card,lock].find(x=>x&&x.style.display==='block');
-  const k=(t&&t.getBoundingClientRect().top<window.innerHeight*0.5)?'profiles':'calc';
-  if(k!==navMainK){navMainK=k;if(!Object.values(TEAM_PAGES).some(id=>{const o=document.getElementById(id);return o&&o.style.display==='flex';}))setNav(null);}
-},{passive:true});

@@ -133,10 +133,22 @@ const N=+(process.argv[3]||30);
   await pg.waitForTimeout(1700);
   ok(!(await ev(()=>document.documentElement.classList.contains('printing'))),'  (in xong trả lại giao diện bình thường)');
 
-  // 5. Thanh điều hướng: Hồ sơ cuộn tới danh sách; đang gõ thì ẩn
-  await pg.click('#bottomNav .bn-item[data-k="profiles"]');await pg.waitForTimeout(900);
-  const top=await ev(()=>document.getElementById('profileCard').getBoundingClientRect().top);
-  ok(!(await vis('reviewOverlay'))&&top<80&&top>-5,'Mục Hồ sơ: đóng trang, cuộn tới danh sách hồ sơ (top='+Math.round(top)+')');
+  // 5. Thanh điều hướng: Hồ sơ mở popup "Hồ sơ đội phạm nhân" như Tổng quan; đang gõ thì ẩn
+  ok(!(await ev(()=>!!document.getElementById('profileCard'))),'Màn hình chính không còn khung "Hồ sơ đội phạm nhân"');
+  await pg.click('#bottomNav .bn-item[data-k="profiles"]');await pg.waitForTimeout(300);
+  const PF=await ev(()=>({n:document.querySelectorAll('#profileList .history-item').length,total:loadProfiles().length,cnt:document.getElementById('profileCount').textContent,
+    title:document.querySelector('#profilesOverlay .result-header').textContent,on:document.querySelector('#bottomNav .bn-item.on').dataset.k,
+    btns:[...document.querySelectorAll('#profileBtns button')].map(b=>b.textContent.replace(/[^\p{L} ]/gu,'').trim())}));
+  ok((await vis('profilesOverlay'))&&!(await vis('reviewOverlay'))&&PF.on==='profiles'&&PF.title.startsWith('Hồ sơ đội phạm nhân'),'Mục Hồ sơ: đóng trang Xét giảm, mở popup "Hồ sơ đội phạm nhân", mục Hồ sơ sáng');
+  ok(PF.n===PF.total&&PF.n>0&&PF.cnt===' ('+PF.total+'/200)'&&PF.btns.join(',')==='Excel,Bảo mật,Xóa hết','  Đủ '+PF.n+' hồ sơ'+PF.cnt+', có nút '+PF.btns.join(', '));
+  const sc=await ev(()=>{const s=document.getElementById('profilesScroll');return {sh:s.scrollHeight,ch:s.clientHeight,list:getComputedStyle(document.getElementById('profileList')).overflowY};});
+  ok(sc.list==='visible','  Danh sách cuộn cùng popup (không có khung cuộn riêng)');
+  await pg.click('#bottomNav .bn-item[data-k="team"]');await pg.waitForTimeout(200);
+  ok((await vis('teamOverlay'))&&!(await vis('profilesOverlay')),'Đang mở Hồ sơ bấm Tổng quan: chuyển sang Tổng quan');
+  await pg.click('#bottomNav .bn-item[data-k="profiles"]');await pg.waitForTimeout(200);
+  await pg.click('#profileList .history-item .btn-save-prof');await pg.waitForTimeout(300);
+  ok(!(await vis('profilesOverlay'))&&(await ev(()=>document.querySelector('#bottomNav .bn-item.on').dataset.k))==='calc'&&(await ev(()=>!!document.getElementById('arrestDateText').value)),
+    'Bấm "Mở lại" một hồ sơ: đóng popup, về màn hình tính án với dữ liệu đã nạp');
   await pg.click('#bottomNav .bn-item[data-k="calc"]');await pg.waitForTimeout(900);
   await pg.click('#prisonerName');await pg.waitForTimeout(300);
   const hid=await ev(()=>document.getElementById('bottomNav').getBoundingClientRect().top>=window.innerHeight-2);

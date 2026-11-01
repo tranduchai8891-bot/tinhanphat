@@ -21,8 +21,15 @@
 
 **Popup "Kết quả tính toán"**
 - Thêm thẻ **"Trừ tạm giam"** cạnh thẻ "Tổng được giảm". "Tổng được giảm" giữ nguyên như cũ, gồm cả tạm giam, khớp với nội dung Sao chép.
-- Thẻ "Thời gian trốn/tạm đình chỉ" đổi thành **"Trốn/ tạm đình chỉ"**, cùng cỡ với các thẻ khác. Thẻ nằm dưới "Tổng được giảm", bên trái "Ngày hết án dự kiến". Số lần ghi ở nhãn nhỏ cạnh tiêu đề, không có thì ghi "0 ngày".
+- Thẻ "Thời gian trốn/tạm đình chỉ" đổi thành **"Trốn/TĐC"**, cùng cỡ với các thẻ khác. Thẻ nằm dưới "Tổng được giảm", bên trái "Ngày hết án dự kiến". Nhãn số lần ("2 lần") nằm cùng hàng với tên thẻ; không có trốn thì thẻ ghi "0 ngày".
 - Màn hình ngang dùng 4 cột để giữ đúng các vị trí trên.
+
+**Hồ sơ đội phạm nhân**
+- Bỏ khung "Hồ sơ đội phạm nhân" khỏi màn hình chính. Bấm mục **"Hồ sơ"** ở thanh dưới sẽ mở popup giống trang Tổng quan, có các nút Excel, Bảo mật, Xóa hết và danh sách hồ sơ cuộn cùng popup.
+- Chưa có hồ sơ: popup báo "Chưa có hồ sơ nào", kèm nút Tải file Excel mẫu và Nhập từ Excel.
+- Hồ sơ đang khóa: bấm "Hồ sơ" sẽ hỏi mã PIN trước.
+- Bấm "Mở lại" một hồ sơ: popup đóng và về màn hình tính án với dữ liệu đã nạp.
+- Khi tự khóa hoặc bấm khóa ngay, phần mềm đóng luôn các trang Hồ sơ, Tổng quan, Xét giảm, Xếp loại. Trước đây trang Tổng quan đang mở vẫn còn hiện tên phạm nhân sau khi khóa.
 
 **Kiểm thử tự động trên GitHub**
 - Ghim các công cụ theo mã băm commit, không theo nhãn `v4` có thể bị đổi:

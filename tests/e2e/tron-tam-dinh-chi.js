@@ -78,7 +78,7 @@ const file='file://'+path.resolve(process.argv[2]);
   ok(R1.remaining==='4 năm 8 tháng 24 ngày','Thời hạn còn lại: '+R1.remaining);
   ok(R1.release==='24/07/2031','Ngày hết án = 29/09/1990 + 40 năm 9 tháng 25 ngày = '+R1.release);
   ok(R1.m==='29/10/1985 11/03/2027 14/04/2028','Mốc 1/4, 1/3, 1/2 dời theo diễn biến: '+R1.m);
-  ok(R1.card==='Trốn/ tạm đình chỉ2 lần40 năm 9 tháng 25 ngày','Popup kết quả có thẻ "Trốn/ tạm đình chỉ": '+R1.card);
+  ok(R1.card==='Trốn/TĐC2 lần40 năm 9 tháng 25 ngày','Popup kết quả có thẻ "Trốn/TĐC": '+R1.card);
   ok(R1.tl.includes('Trốn/tạm đình chỉ lần 2: 02/04/1986 – 11/09/2026+ 40 năm 5 tháng 9 ngày'),'Dòng thời gian liệt kê từng lần');
   ok(R1.copy.includes('Thời gian trốn/tạm đình chỉ: 40 năm 9 tháng 25 ngày (2 lần)\n  Lần 1: 13/11/1985 - 29/03/1986 (4 tháng 16 ngày)')&&R1.copy.includes('Ngày hết án dự kiến: 24/07/2031'),'Văn bản Sao chép có các lần trốn/tạm đình chỉ');
   ok(R1.elig.includes('11/03/2027'),'Dòng đợt xét giảm dùng mốc 1/3 đã dời: '+R1.elig.slice(0,60));

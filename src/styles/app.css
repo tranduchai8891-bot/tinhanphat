@@ -541,9 +541,10 @@ body.typing .bottom-nav{transform:translateY(120%)}
   font-family:'Be Vietnam Pro',-apple-system,sans-serif;font-size:11px;font-weight:600;color:#5b616e;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .bn-item svg{width:22px;height:22px}
 .bn-item.on{color:#7f1d1d;font-weight:800}
-#teamOverlay,#reviewOverlay,#gradeOverlay{z-index:990;padding-bottom:calc(74px + env(safe-area-inset-bottom))}
+#teamOverlay,#reviewOverlay,#gradeOverlay,#profilesOverlay{z-index:990;padding-bottom:calc(74px + env(safe-area-inset-bottom))}
 .team-page .modal-box{height:100%}
 .tp-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.pf-btns{margin-bottom:12px}
 .tp-empty{padding:22px 10px;text-align:center;font-size:13px;color:#525866;line-height:1.6}
 .tp-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px}
 .tp-stat{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1.5px solid #e6e3de;background:#fff;border-radius:12px;padding:10px 12px;
@@ -756,7 +757,8 @@ body.typing .bottom-nav{transform:translateY(120%)}
 #profDetailBody .rm-card{margin-bottom:12px}
 #profDetailBody .qgrid{font-size:10.5px}
 #profDetailBody .qg-cell{padding:6px 2px;font-size:10px}
-#profileList{max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px}
+/* Danh sách hồ sơ nằm trong popup: cuộn cùng popup, không giới hạn chiều cao riêng */
+#profileList{max-height:none;overflow:visible;padding-right:0}
 #profileList::-webkit-scrollbar{width:5px}
 #profileList::-webkit-scrollbar-thumb{background:#d6c39a;border-radius:3px}
 #profileList::-webkit-scrollbar-track{background:transparent}

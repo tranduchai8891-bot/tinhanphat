@@ -45,8 +45,11 @@ const file='file://'+path.resolve(process.argv[2]);
       nextTo:Math.abs(pre.top-red.top)<2&&pre.left>red.right-1,below:esc.top>=red.bottom-1&&Math.abs(esc.left-red.left)<2,leftOf:Math.abs(esc.top-rel.top)<2&&esc.right<=rel.left+1,
       same:[pre,esc].every(b=>Math.abs(b.width-arr.width)<1)};});
   ok(lay.predet==='2 tháng 15 ngày'&&lay.nextTo,'Thẻ "Trừ tạm giam" ('+lay.predet+') nằm cạnh "Tổng được giảm" ('+lay.reduced+')');
-  ok(lay.esc==='4 tháng 16 ngày'&&lay.escN==='1 lần'&&lay.below&&lay.leftOf,'Thẻ "Trốn/ tạm đình chỉ" ('+lay.esc+', '+lay.escN+') dưới "Tổng được giảm", bên trái "Ngày hết án dự kiến"');
+  ok(lay.esc==='4 tháng 16 ngày'&&lay.escN==='1 lần'&&lay.below&&lay.leftOf,'Thẻ "Trốn/TĐC" ('+lay.esc+', '+lay.escN+') dưới "Tổng được giảm", bên trái "Ngày hết án dự kiến"');
   ok(lay.same,'  Hai thẻ mới cùng cỡ với các thẻ Ngày bắt, Mức án…');
+  const row=await pg.evaluate(()=>{const a=document.querySelector('#r-esc-n').getBoundingClientRect(),t=document.getElementById('r-esc').closest('.metric').querySelector('.lbl-txt');
+    const b=t.getBoundingClientRect();return {txt:t.textContent,same:Math.abs((a.top+a.bottom)/2-(b.top+b.bottom)/2)<3};});
+  ok(row.txt==='Trốn/TĐC'&&row.same,'  Tên thẻ "Trốn/TĐC", nhãn số lần nằm cùng hàng với tên thẻ');
   await pg.evaluate(()=>{closeModal();escapes=[];escOwner=null;remissions=[{years:0,months:0}];renderRemissions();document.getElementById('pdM').value='';document.getElementById('pdD').value='';});
   // 2. Nghị quyết 03/2024/NQ-HĐTP ghi đầy đủ
   const nq=await pg.evaluate(()=>{const t=document.body.textContent;return {bad:(t.match(/Nghị quyết 03(?!\/2024\/NQ-HĐTP)/g)||[]).length,full:(t.match(/Nghị quyết 03\/2024\/NQ-HĐTP/g)||[]).length};});
