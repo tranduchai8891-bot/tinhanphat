@@ -1,5 +1,31 @@
 # Nhật ký thay đổi
 
+## v97 — 01/11/2026
+
+**Chính sách bảo mật nội dung (CSP)**
+- Thêm CSP ở đầu trang. Trình duyệt chỉ cho phép:
+  - nạp mã, ảnh, phông chữ từ chính trang này (và mã thống kê Cloudflare);
+  - gửi dữ liệu về chính trang này (và máy chủ thống kê Cloudflare).
+
+  Mọi máy chủ khác đều bị chặn.
+- Đã kiểm tra:
+  - Mã lạ thử gửi dữ liệu hồ sơ ra ngoài (fetch, beacon, ảnh, WebSocket) và thử nạp mã độc từ máy chủ lạ: đều bị chặn, không yêu cầu nào ra tới mạng.
+  - Mọi chức năng vẫn chạy bình thường: tính án, giảm án, hồ sơ, xuất/nhập Excel và file dữ liệu, in phiếu, khóa PIN, camera quét QR, service worker, mở khi mất mạng.
+- Giới hạn: CSP không chặn được trường hợp tài khoản GitHub bị chiếm, vì người sửa `index.html` có thể xóa luôn CSP. Cần bật xác thực 2 lớp và bảo vệ nhánh `main`.
+
+**Phông chữ nhúng sẵn**
+- Be Vietnam Pro (400, 500, 600, 700) và Playfair Display (700, dùng cho tiêu đề), bộ ký tự Latin và tiếng Việt, nhúng vào `index.html`. Không còn tải từ Google Fonts.
+- Hiển thị đúng phông cả khi không có mạng. Trước đây khi mất mạng, trang dùng phông của máy.
+- `index.html` nặng thêm khoảng 225 KB, khi tải qua mạng thêm khoảng 175 KB.
+- Giấy phép SIL Open Font License 1.1 kèm trong `src/fonts-license/`.
+
+**Kiểm thử tự động trên GitHub**
+- Ghim các công cụ theo mã băm commit, không theo nhãn `v4` có thể bị đổi:
+  - actions/checkout v4.4.0;
+  - actions/setup-node v4.4.0;
+  - actions/upload-artifact v4.6.2.
+- Thêm nhóm kiểm thử "Bảo mật nội dung (CSP), phông chữ nhúng sẵn" (14 mục).
+
 ## v96 — 31/10/2026
 
 - Nút **"Chia sẻ dữ liệu"** chuyển từ khung "Hồ sơ đội phạm nhân" xuống **chân trang**, thay cho nút "Chữ lớn".

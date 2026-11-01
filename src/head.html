@@ -2,6 +2,10 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
+<!-- Chính sách bảo mật nội dung (CSP): trình duyệt chỉ cho trang nạp mã, ảnh, phông từ chính trang này
+     (và mã thống kê Cloudflare), cấm gửi dữ liệu tới máy chủ khác. Dù có mã lạ lọt vào, dữ liệu hồ sơ
+     cũng không gửi ra ngoài được bằng fetch/XHR/ảnh/beacon. Thêm nguồn mới phải sửa tại đây. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; connect-src 'self' https://cloudflareinsights.com; manifest-src 'self'; worker-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <link rel="preload" as="image" href="./splash-logo.png" fetchpriority="high">

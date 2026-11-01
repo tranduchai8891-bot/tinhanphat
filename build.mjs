@@ -8,12 +8,12 @@ import {fileURLToPath} from 'node:url';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const read = p => fs.readFileSync(path.join(root, p), 'utf8');
-const MIME = {png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml'};
+const MIME = {png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', svg: 'image/svg+xml', woff2: 'font/woff2'};
 
-// Ảnh trong src/assets được nhúng thẳng vào trang (dạng base64) để app chạy được khi không có mạng
+// Ảnh và phông chữ trong src/assets được nhúng thẳng vào trang (dạng base64) để app chạy được khi không có mạng
 function assetURI(name) {
   const ext = name.split('.').pop().toLowerCase();
-  if (!MIME[ext]) throw new Error('Không rõ loại ảnh: ' + name);
+  if (!MIME[ext]) throw new Error('Không rõ loại tệp: ' + name);
   const buf = fs.readFileSync(path.join(root, 'src/assets', name));
   return 'data:' + MIME[ext] + ';base64,' + buf.toString('base64');
 }
