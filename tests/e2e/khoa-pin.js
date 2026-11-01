@@ -59,7 +59,10 @@ const SP=require('os').tmpdir()+'/';
   ok(st.profiles===1&&st.history===2,'Ngay sau khi bật: vẫn xem được 1 hồ sơ, 2 lịch sử');
   // 3. Mở lại app -> bị khóa
   await pg.reload();await pg.waitForTimeout(1300);await helpers();
-  ok(await vis('lockCard')&&!(await vis('profileCard'))&&!(await vis('historyCard')),'Mở lại app: hồ sơ & lịch sử bị ẩn, hiện thẻ "Đã khóa"');
+  ok(await vis('lockCard')&&!(await vis('historyCard'))&&!(await ev(()=>document.getElementById('profileList').textContent.trim())),'Mở lại app: hồ sơ & lịch sử bị ẩn, hiện thẻ "Đã khóa"');
+  await ev(()=>goNav('profiles'));
+  ok((await vis('pinOverlay'))&&!(await vis('profilesOverlay')),'Đang khóa: bấm mục Hồ sơ thì hỏi mã PIN trước');
+  await ev(()=>closePin());
   ok((await ev(()=>loadProfiles().length))===0,'  (đang khóa: không đọc được hồ sơ)');
   await ev(()=>calcFor('Lê Văn C','01/02/2024','2 năm'));
   ok(await ev(()=>document.getElementById('modalOverlay').classList.contains('show')),'Đang khóa: vẫn tính án bình thường');
@@ -74,7 +77,12 @@ const SP=require('os').tmpdir()+'/';
   ok(after.p.includes('Lê Văn C')&&after.p.includes('Trần Thị B'),'Đúng PIN: mở khóa và lưu luôn hồ sơ C');
   ok(JSON.stringify(after.h)===JSON.stringify(['Lê Văn C','Lê Văn C','Trần Thị B','Nguyễn Văn A']),'Lịch sử gộp đúng các lần tính khi đang khóa ('+after.h.join(', ')+')');
   await ev(()=>closeModal());
-  ok(await vis('profileCard')&&!(await vis('lockCard')),'Đã mở khóa: hiện lại danh sách');
+  ok(await vis('historyCard')&&!(await vis('lockCard')),'Đã mở khóa: hiện lại danh sách');
+  await ev(()=>goNav('profiles'));
+  ok((await vis('profilesOverlay'))&&!(await vis('pinOverlay'))&&(await ev(()=>document.querySelectorAll('#profileList .history-item').length))===2,'  Mục Hồ sơ mở ngay popup, có đủ 2 hồ sơ');
+  await ev(()=>lockNow());await pg.waitForTimeout(100);
+  ok(!(await vis('profilesOverlay'))&&!(await ev(()=>document.getElementById('profileList').textContent.trim())),'  Khóa ngay khi đang mở popup Hồ sơ: popup đóng, danh sách bị xóa khỏi trang');
+  await ev(()=>openPin('unlock'));await ev(()=>pin('123456'));
   // 5. Bộ đếm nhập sai; sai 5 lần -> phải chờ
   await ev(()=>openSecurity());
   const sec=await ev(()=>({notes:document.querySelectorAll('#secBody .sec-note').length,desc:document.querySelectorAll('#secBody .exp-opt-d').length,btn:[...document.querySelectorAll('#secBody .exp-opt-t')].map(x=>x.textContent)}));

@@ -26,7 +26,8 @@ src/
       21-nhap-excel             đọc file Excel/CSV
       23-tu-kiem-tra            bộ tự kiểm tra độ chính xác (#kiemthu)
   vendor/jsqr.min.js         ← thư viện đọc mã QR (không sửa)
-  assets/                    ← ảnh nền, logo, ảnh hướng dẫn (được nhúng vào index.html khi ghép)
+  assets/                    ← ảnh nền, logo, ảnh hướng dẫn, phông chữ .woff2 (được nhúng vào index.html khi ghép)
+  fonts-license/             ← giấy phép SIL Open Font License của phông Be Vietnam Pro, Playfair Display
   build-plan.json            ← thứ tự ghép các tệp trên
   sw.template.js             ← mẫu service worker
 tests/
@@ -81,5 +82,15 @@ Khi chủ động sửa, kiểm thử sẽ báo khác. Đó là điều đúng: 
 Chỉ cập nhật hai thứ này khi chắc chắn thay đổi là cố ý. Nếu không cố ý sửa cách tính mà kiểm thử báo khác, đó là lỗi cần tìm.
 
 ## Bảo mật dữ liệu
+
+**Chính sách bảo mật nội dung (CSP)** nằm ở đầu `src/head.html`. Trình duyệt chỉ cho trang:
+
+- nạp mã, ảnh, phông chữ từ chính trang này (và mã thống kê Cloudflare);
+- gửi dữ liệu về chính trang này (và máy chủ thống kê Cloudflare).
+
+Mọi máy chủ khác đều bị chặn. Khi cần dùng thêm một nguồn bên ngoài, phải thêm vào CSP, nếu không chức năng đó sẽ bị chặn. Nhóm kiểm thử `bao-mat-noi-dung.js` sẽ báo nếu CSP chặn nhầm một chức năng.
+
+Phần mềm không tải gì từ Google: phông chữ đã nhúng sẵn trong `index.html`.
+
 
 Kho mã này **không chứa dữ liệu phạm nhân nào**. Hồ sơ chỉ nằm trong trình duyệt trên máy người dùng, được mã hóa bằng mã PIN. File xuất dữ liệu luôn có mật khẩu. Các file trong `tests/fixtures/` là dữ liệu giả để kiểm thử. Không đưa file dữ liệu thật lên kho.

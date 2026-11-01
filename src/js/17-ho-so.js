@@ -224,15 +224,20 @@ function sortProfiles(ps){
   });
   return arr;
 }
+// Danh sách nằm trong popup "Hồ sơ đội phạm nhân" (mục Hồ sơ ở thanh dưới)
 function renderProfiles(){
-  const card=document.getElementById('profileCard');
   const list=document.getElementById('profileList');
   const cnt=document.getElementById('profileCount');
-  if(!card||!list)return;
-  if(renderLockCard()){card.style.display='none';return;}
+  const btns=document.getElementById('profileBtns'), empty=document.getElementById('profileEmpty');
+  if(!list)return;
+  if(renderLockCard()){   // đang khóa: xóa danh sách khỏi trang, đóng popup
+    list.innerHTML='';if(cnt)cnt.textContent='';
+    const ov=document.getElementById('profilesOverlay');if(ov&&ov.style.display==='flex')closeProfiles();
+    return;}
   const ps=refreshProfiles();   // cập nhật thông số theo ngày hiện tại
-  if(!ps.length){card.style.display='none';return;}
-  card.style.display='block';
+  if(btns)btns.style.display=ps.length?'':'none';
+  if(empty)empty.style.display=ps.length?'none':'';
+  if(!ps.length){list.innerHTML='';if(cnt)cnt.textContent='';return;}
   if(cnt)cnt.textContent=' ('+ps.length+'/'+PROFILES_MAX+')';
   list.innerHTML=backupReminderHTML()+sortProfiles(ps).map(o=>{
     const p=o.p, i=o.idx;   // i là vị trí GỐC trong mảng lưu trữ
@@ -381,6 +386,8 @@ function loadProfile(i){
   const p=sanitizeProfile(loadProfiles()[i]);
   if(!p||!p.data){showWarn('Hồ sơ này chưa có dữ liệu chi tiết.');return}
   const d=p.data;
+  // Mở lại từ popup Hồ sơ / Tổng quan: đóng các trang đó để thấy ngay màn hình tính án
+  closeTeamPages();navMainK='calc';setNav(null);
   const set=(id,v)=>{const el=document.getElementById(id);if(el){el.value=v||'';toggleClearBtn&&el.parentElement&&el.parentElement.querySelector('.input-clear-btn')&&toggleClearBtn(el);}};
   set('prisonerName',p.name);
   set('arrestDateText',d.arrestText);

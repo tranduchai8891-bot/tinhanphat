@@ -1,5 +1,43 @@
 # Nhật ký thay đổi
 
+## v97 — 01/11/2026
+
+**Chính sách bảo mật nội dung (CSP)**
+- Thêm CSP ở đầu trang. Trình duyệt chỉ cho phép:
+  - nạp mã, ảnh, phông chữ từ chính trang này (và mã thống kê Cloudflare);
+  - gửi dữ liệu về chính trang này (và máy chủ thống kê Cloudflare).
+
+  Mọi máy chủ khác đều bị chặn.
+- Đã kiểm tra:
+  - Mã lạ thử gửi dữ liệu hồ sơ ra ngoài (fetch, beacon, ảnh, WebSocket) và thử nạp mã độc từ máy chủ lạ: đều bị chặn, không yêu cầu nào ra tới mạng.
+  - Mọi chức năng vẫn chạy bình thường: tính án, giảm án, hồ sơ, xuất/nhập Excel và file dữ liệu, in phiếu, khóa PIN, camera quét QR, service worker, mở khi mất mạng.
+- Giới hạn: CSP không chặn được trường hợp tài khoản GitHub bị chiếm, vì người sửa `index.html` có thể xóa luôn CSP. Cần bật xác thực 2 lớp và bảo vệ nhánh `main`.
+
+**Phông chữ nhúng sẵn**
+- Be Vietnam Pro (400, 500, 600, 700) và Playfair Display (700, dùng cho tiêu đề), bộ ký tự Latin và tiếng Việt, nhúng vào `index.html`. Không còn tải từ Google Fonts.
+- Hiển thị đúng phông cả khi không có mạng. Trước đây khi mất mạng, trang dùng phông của máy.
+- `index.html` nặng thêm khoảng 225 KB, khi tải qua mạng thêm khoảng 175 KB.
+- Giấy phép SIL Open Font License 1.1 kèm trong `src/fonts-license/`.
+
+**Popup "Kết quả tính toán"**
+- Thêm thẻ **"Trừ tạm giam"** cạnh thẻ "Tổng được giảm". "Tổng được giảm" giữ nguyên như cũ, gồm cả tạm giam, khớp với nội dung Sao chép.
+- Thẻ "Thời gian trốn/tạm đình chỉ" đổi thành **"Trốn/TĐC"**, cùng cỡ với các thẻ khác. Thẻ nằm dưới "Tổng được giảm", bên trái "Ngày hết án dự kiến". Nhãn số lần ("2 lần") nằm cùng hàng với tên thẻ; không có trốn thì thẻ ghi "0 ngày".
+- Màn hình ngang dùng 4 cột để giữ đúng các vị trí trên.
+
+**Hồ sơ đội phạm nhân**
+- Bỏ khung "Hồ sơ đội phạm nhân" khỏi màn hình chính. Bấm mục **"Hồ sơ"** ở thanh dưới sẽ mở popup giống trang Tổng quan, có các nút Excel, Bảo mật, Xóa hết và danh sách hồ sơ cuộn cùng popup.
+- Chưa có hồ sơ: popup báo "Chưa có hồ sơ nào", kèm nút Tải file Excel mẫu và Nhập từ Excel.
+- Hồ sơ đang khóa: bấm "Hồ sơ" sẽ hỏi mã PIN trước.
+- Bấm "Mở lại" một hồ sơ: popup đóng và về màn hình tính án với dữ liệu đã nạp.
+- Khi tự khóa hoặc bấm khóa ngay, phần mềm đóng luôn các trang Hồ sơ, Tổng quan, Xét giảm, Xếp loại. Trước đây trang Tổng quan đang mở vẫn còn hiện tên phạm nhân sau khi khóa.
+
+**Kiểm thử tự động trên GitHub**
+- Ghim các công cụ theo mã băm commit, không theo nhãn `v4` có thể bị đổi:
+  - actions/checkout v4.4.0;
+  - actions/setup-node v4.4.0;
+  - actions/upload-artifact v4.6.2.
+- Thêm nhóm kiểm thử "Bảo mật nội dung (CSP), phông chữ nhúng sẵn" (14 mục).
+
 ## v96 — 31/10/2026
 
 - Nút **"Chia sẻ dữ liệu"** chuyển từ khung "Hồ sơ đội phạm nhân" xuống **chân trang**, thay cho nút "Chữ lớn".

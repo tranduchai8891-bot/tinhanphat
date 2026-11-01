@@ -118,6 +118,7 @@ async function lockNow(){
   profDetailIdx=null;
   const hd=document.getElementById('historyDetailOverlay'); if(hd)hd.classList.remove('show');
   closeModal();
+  if(typeof closeTeamPages==='function'){closeTeamPages();setNav(null);}
   document.body.style.overflow='';
   renderHistory(); renderProfiles();
 }
